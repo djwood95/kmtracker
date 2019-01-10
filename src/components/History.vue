@@ -34,6 +34,10 @@
                 <b-table-column field="comments" label="Comments">
                     {{props.row.comments}}
                 </b-table-column>
+
+                <b-table-column field="edit">
+                    <div class="button">Edit</div>
+                </b-table-column>
             </template>
 
             <template slot="footer">
