@@ -1,0 +1,282 @@
+{
+    "mtu": {
+        "abbr": "mtu",
+        "fullName": "Michigan Tech Trails",
+        "trails": {
+            "Upper Trails": {
+                "color": "green",
+                "mapFile": "Upper.jpg",
+                "trails": [
+                    {
+                        "name": "Birch Loop",
+                        "distance": 1.2,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Oak Loop",
+                        "distance": 1.1,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Pine Loop",
+                        "distance": 0.9,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Core Loop",
+                        "distance": 1.2,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Portage Loop",
+                        "distance": 1.1,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Isle Royale Loop",
+                        "distance": 1.9,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Superior Loop",
+                        "distance": 0.8,
+                        "color": "green"
+                    }
+                ]
+            },
+
+            "Competition Trails": {
+                "color": "black",
+                "mapFile": "Lower.jpg",
+                "trails": [
+                    {
+                        "name": "Linden Loop",
+                        "distance": 0.8,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Peepsock Loop",
+                        "distance": 1.0,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Cemetary Loop",
+                        "distance": 0.8,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Balsam Loop",
+                        "distance": 1.0,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Maple Loop",
+                        "distance": 1.1,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Skidder Loop",
+                        "distance": 1.7,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Hairpin Loop",
+                        "distance": 1.2,
+                        "color": "blue"
+                    }
+                ]
+            },
+
+            "Nara Trails": {
+                "color": "blue",
+                "mapFile": "Nara.png",
+                "trails": [
+                    {
+                        "name": "Down Under Loop",
+                        "distance": 0.8,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Ridge Loop",
+                        "distance": 2.0,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Tanglewood Loop",
+                        "distance": 1.4,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Homestead Loop",
+                        "distance": 0.9,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Racer's Return",
+                        "distance": 0.3,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Nara Loop",
+                        "distance": 0.8,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Royalwood Loop",
+                        "distance": 1.0,
+                        "color": "green"
+                    },
+                    {
+                        "name": "River Loop",
+                        "distance": 0.8,
+                        "color": "purple"
+                    }
+                ]
+            },
+
+            "Tolkien Trails": {
+                "color": "purple",
+                "mapFile": "Tolkien.jpg",
+                "trails": [
+                    {
+                        "name": "Troll Loop",
+                        "distance": 1.8,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "Ring Loop",
+                        "distance": 1.1,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "Ent Loop",
+                        "distance": 0.9,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "Gnome Loop",
+                        "distance": 0.9,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "Elf Loop",
+                        "distance": 1.7,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "Hobbit Loop",
+                        "distance": 0.7,
+                        "color": "purple"
+                    }
+                ]
+            }
+        }
+    },
+
+    "swedetown": {
+        "abbr": "swedetown",
+        "fullName": "Swedetown Trails",
+        "trails": {
+            "Main Trails": {
+                "color": "green",
+                "mapFile": "Easy.png",
+                "trails": [
+                    {
+                        "name": "Valley Trail",
+                        "distance": 1.4,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Cedar Loop",
+                        "distance": 0.9,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Tamarack Loop",
+                        "distance": 1.1,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Greenstone Loop",
+                        "distance": 3.0,
+                        "color": "green"
+                    },
+                    {
+                        "name": "Len's Loop",
+                        "distance": 1.0,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Pine Loop",
+                        "distance": 1.7,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Powderhouse Loop",
+                        "distance": 4.5,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Birch Loop",
+                        "distance": 3.3,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Ed's Loop",
+                        "distance": 2.0,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Backcountry Loop",
+                        "distance": 4.0,
+                        "color": "purple"
+                    }
+                ]
+            },
+
+            "Bear Trails": {
+                "color": "blue",
+                "mapFile": "Bear.png",
+                "trails": [
+                    {
+                        "name": "Mama Bear Loop",
+                        "distance": 3.1,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Baby Bear Loop",
+                        "distance": 1.3,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Papa Bear Loop",
+                        "distance": 3.0,
+                        "color": "blue"
+                    }
+                ]
+            },
+
+            "Multi-Use Trails": {
+                "color": "purple",
+                "mapFile": "MultiUse.png",
+                "trails": [
+                    {
+                        "name": "Bruce's Crossing",
+                        "distance": 1.0,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "Lotus Lookout",
+                        "distance": 1.4,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "Unnamed Multi-Use Loop",
+                        "distance": 1.2,
+                        "color": "purple"
+                    }
+                ]
+            }
+        }
+    }
+}
