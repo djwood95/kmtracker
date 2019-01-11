@@ -36,7 +36,7 @@
                 </b-table-column>
 
                 <b-table-column field="edit">
-                    <div class="button" @click="editEntry()">Edit</div>
+                    <div class="button" @click="editEntry()">TEST</div>
                 </b-table-column>
             </template>
 
