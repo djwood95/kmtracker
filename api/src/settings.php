@@ -25,5 +25,5 @@ return [
         ],
 
         'determineRouteBeforeAppMiddleware' => true
-    ],
+    ]
 ];
