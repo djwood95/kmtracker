@@ -1,10 +1,11 @@
 <template>
     <div>
         <b-loading :is-full-page="$mq==='mobile'" :active.sync="isLoading"></b-loading>
-        <div id="leaderboardSettings">
+        <div id="leaderboardSettings" v-if="header">
             <b-field grouped group-multiline v-if="!groupStandingsMode">
                 <b-field label="Filter By Group:">
                     <b-select v-model="selectedGroup">
+                        <option value='All'>All</option>
                         <option v-for="(group,i) in groupList" :value="group.abbr" :key="i">{{group.name}}</option>
                     </b-select>
                 </b-field>
@@ -49,17 +50,17 @@
         </div>
 
         <div>
-            <b-table :data="filteredList" :mobile-cards="false" v-if="$mq==='desktop'" narrowed>
+            <b-table :data="filteredList" :mobile-cards="false" v-if="$mq!=='mobile'" narrowed>
                 <template slot-scope="props">
-                    <b-table-column field="place" label="Place" width="40" :visible="$mq==='desktop' && !groupStandingsMode">
+                    <b-table-column field="place" label="Place" width="40" :visible="$mq!=='mobile' && !groupStandingsMode">
                         {{props.row.place}}
                     </b-table-column>
 
                     <b-table-column field="username" label="Name" width="200" :visible="!groupStandingsMode">
-                        {{props.row.username}}
+                        <span v-html="props.row.username"></span>
                     </b-table-column>
 
-                    <b-table-column field="colorgroup" label="Group" width="100" :visible="$mq==='desktop'">
+                    <b-table-column field="colorgroup" label="Group" width="100" :visible="$mq!=='mobile'">
                         {{props.row.colorgroup}}
                     </b-table-column>
 
@@ -91,6 +92,8 @@
 import ProgressBar from './ProgressBar.vue'
 import ProgressBarMobile from './ProgressBarMobile.vue'
 export default {
+
+    props: ['header'],
 
     components: {
         ProgressBar,

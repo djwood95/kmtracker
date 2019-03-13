@@ -10,6 +10,7 @@ import Settings from './components/Settings.vue'
 import History from './components/History.vue'
 import Login from './components/Login.vue'
 import NewEntry from './components/NewEntry.vue'
+import ForgotPass from './components/ForgotPass.vue'
 
 import 'buefy/dist/buefy.css'
 
@@ -19,14 +20,17 @@ Vue.use(VueRouter)
 Vue.config.productionTip = false
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/home', component: Home },
-  { path: '/leaderboard', component: Leaderboard },
-  { path: '/newAccount', component: NewAccount },
-  { path: '/settings', component: Settings },
-  { path: '/history', component: History },
-  { path: '/login', component: Login },
-  { path: '/newEntry', component: NewEntry }
+  { path: '/', component: Home, meta: {name: 'home', public: true} },
+  { path: '/home', component: Home, meta: {name: 'home', public: true} },
+  { path: '/leaderboard', component: Leaderboard, props: {header: true}, meta: {name: 'leaderboard', public: true} },
+  { path: '/leaderboard/noHeader', component: Leaderboard, props: {header: false}, meta: {name: 'leaderboard-NH', public: true} },
+  { path: '/newAccount', component: NewAccount, meta: {name: 'newAccount', public: true} },
+  { path: '/settings', component: Settings, meta: {name: 'settings', public: false} },
+  { path: '/history', component: History, meta: {name: 'history', public: false} },
+  { path: '/login', component: Login, meta: {name: 'login', public: true} },
+  { path: '/newEntry', component: NewEntry, meta: {name: 'newEntry', public: false} },
+  { path: '/newEntry/:entryId', component: NewEntry, meta: {name: 'editEntry', public: false} },
+  { path: '/forgotPassword', component: ForgotPass, meta: {name: 'forgotPass', public: true} }
 ]
 
 const router = new VueRouter({
@@ -37,7 +41,8 @@ import VueMq from 'vue-mq'
 Vue.use(VueMq, {
   breakpoints: {
     mobile: 768,
-    desktop: Infinity
+    desktop: 1216,
+    widescreen: Infinity
   }
 })
 
@@ -49,18 +54,16 @@ import VueAxios from 'vue-axios'
 Vue.use(axios, VueAxios)
 
 if(process.env.NODE_ENV == "production") {
-  Vue.prototype.$api = "/shine3/api/public/api"
-  Vue.prototype.$publicAPI = "/shine3/api/public/public"
+  Vue.prototype.$api = "/kmtracker/api/public"
 } else {
   Vue.prototype.$api = "http://localhost:8081"
-  Vue.prototype.$publicAPI = "http://localhost:8080/public"
 }
 
 axios.interceptors.response.use(
   response => response,
   error => {
       const {status} = error.response;
-      if (status === 401) {
+      if (status === 401 && !router.currentRoute.meta.public ) {
         router.push('/login');
       }
       return Promise.reject(error);
@@ -69,9 +72,9 @@ axios.interceptors.response.use(
 
 Vue.prototype.$http = axios
 Vue.prototype.$groups = {
-  All: {name: 'All', abbr: 'All', bgColor: 'black', txtColor: 'white'},
   green: {name: 'Green', abbr: 'green', bgColor: 'green', txtColor: 'white'},
   blue: {name: 'Blue', abbr: 'blue', bgColor: 'blue', txtColor: 'white'},
+  gray: {name: 'Gray', abbr: 'gray', bgColor: 'lightblue', txtColor: 'black'},
   red: {name: 'Red', abbr: 'red', bgColor: 'red', txtColor: 'black'},
   yellow: {name: 'Yellow', abbr: 'yellow', bgColor: 'yellow', txtColor: 'black'},
   purple: {name: 'Purple', abbr: 'purple', bgColor: 'purple', txtColor: 'white'},
@@ -79,7 +82,7 @@ Vue.prototype.$groups = {
   devo: {name: 'Development Team (Devo)', abbr: 'devo', bgColor: 'gray', txtColor: 'black'},
   comp: {name: 'Competition Team (Comp)', abbr: 'comp', bgColor: 'orange', txtColor: 'black'},
   parent: {name: 'Parents/Coaches/Other', abbr: 'parent', bgColor: 'black', txtColor: 'white'},
-  other: {name: 'Other', abbr: 'other', bgColor: 'black', txtColor: 'white'}
+  other: {name: 'Other', abbr: 'other', bgColor: 'black', txtColor: 'white'},
 }
 
 new Vue({

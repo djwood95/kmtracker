@@ -10,7 +10,8 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 /* Check Token, returns 401 if it doesn't pass */
 $app->add(new JwtAuthentication([
 	"secret" => $_ENV['JWT_SECRET'],
-	"path" => "/api",
+	"secure" => false,
+	"path" => "/api"
 ]));
 
 /* Send userId to route */

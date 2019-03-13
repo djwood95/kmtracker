@@ -92,8 +92,11 @@ class Util extends Mapper {
 	public function newAccount($info) {
 
 		//check for duplicate username
-		//$usernameList = self::getUsernameList();
-		//if(in_array($info->username, $usernameList)) return false;
+		$usernameList = self::getUsernameList();
+		if(in_array($info['username'], $usernameList)) return false;
+
+		//check that password is valid
+		if(strlen($info['password1']) < 6 || strlen($info['password1']) > 100) return false;
 
 		$stmt = $this->db->prepare("INSERT INTO users (username, password2, email, colorgroup)
 									VALUES (:username, :pass, :email, :colorgroup)");
@@ -134,6 +137,102 @@ class Util extends Mapper {
 		]);
 
 		return true;
+	}
+
+	public function trackPageLoad($userId, $toPage, $fromPage, $deviceWidth, $deviceHeight) {
+		//return "$userId, $toPage, $fromPage, $deviceWidth, $deviceHeight";
+		$stmt = $this->db->prepare("INSERT INTO activity (userId, toPage, fromPage, deviceWidth, deviceHeight)
+									VALUES (:userId, :toPage, :fromPage, :deviceWidth, :deviceHeight)");
+
+		$stmt->execute([
+			'userId' => $userId,
+			'toPage' => $toPage,
+			'fromPage' => $fromPage,
+			'deviceWidth' => $deviceWidth,
+			'deviceHeight' => $deviceHeight
+		]);
+	}
+
+	public function resetPassCheckEmail($username, $email) {
+
+		//Check username/email combination
+		$stmt = $this->db->prepare("SELECT * FROM users WHERE username=:username AND email=:email");
+		$stmt->execute([
+			'username' => $username,
+			'email' => $email
+		]);
+
+		if($stmt->rowCount() != 1) return false;
+
+		while($row = $stmt->fetch()) {
+			$userId = $row['id'];
+		}
+
+		//delete existing passwordRecovery rows for this user
+		$stmt = $this->db->prepare("DELETE FROM passwordRecovery WHERE userId=:userId");
+		$stmt->execute(['userId' => $userId]);
+
+		$code = substr(md5(rand()), 0, 7);
+		$expires = date("Y-m-d H:i:s", strtotime("+1 hour"));
+
+		//add new password recover info to database
+		$stmt = $this->db->prepare("INSERT INTO passwordRecovery (userId, code, expires) VALUES (:userId, :code, :expires)");
+		$stmt->execute([
+			'userId' => $userId,
+			'code' => $code,
+			'expires' => $expires
+		]);
+
+		//send email with reset code
+		$to = $email;
+		$subject = "KM Tracker Password Reset";
+
+		$message = "
+		<html>
+		<head>
+		<title>KM Tracker Password Reset</title>
+		</head>
+		<body>
+		Hello, $username<br/><br/>
+
+		It appears that you have requested a password reset for <a href='https://kmtracker.org'>kmtracker.org</a>.
+		If you requested this reset and would like to continue, you can use the code below:<br/><br/>
+
+		<h4>$code</h4><br/>
+
+		If you did not request the code, please <a href='https://kmtracker.org/resetPass/cancel/$code'>click here</a>
+		to cancel the reset.
+
+		</body>
+		</html>
+		";
+
+		// Always set content-type when sending HTML email
+		$headers = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+
+		// More headers
+		$headers .= 'From: <no-reply@kmtracker.org>' . "\r\n";
+
+		mail($to,$subject,$message,$headers);
+
+		return ['userId' => $userId];
+
+	}
+
+
+	public function resetPassCheckCode($userId, $code) {
+
+		$curDate = date("Y-m-d H:i:s");
+
+		$stmt = $this->db->prepare("SELECT * FROM passwordRecovery WHERE userId=:userId AND code=:code AND expires>=:curDate");
+		$stmt->execute([
+			'userId' => $userId,
+			'code' => $code,
+			'curDate' => $curDate
+		]);
+
+		return $stmt->rowCount() == 1;
 	}
 
 

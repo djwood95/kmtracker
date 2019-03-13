@@ -12,7 +12,7 @@
         <div class="buttons has-addons" style="width:100%;margin-bottom:10px;">
             <div class="button is-primary is-fullwidth" @click="checkLogin()">Login</div>
             <div class="button is-small is-info is-outlined is-expanded" @click="$router.push('/newAccount')">New Account</div>
-            <div class="button is-small is-info is-outlined is-expanded" @click="forgotPass()">Forgot Password</div>
+            <div class="button is-small is-info is-outlined is-expanded" @click="$router.push('/forgotPassword')">Forgot Password</div>
         </div>
 
         <b-modal :active.sync="newAccountBoxActive" has-modal-card>
@@ -67,7 +67,7 @@ export default {
         },
 
         forgotPass() {
-
+            this.$dialog.alert('Coming soon! For now, please email djwood@mtu.edu with your current username using the email associated with your account.');
         }
     }
 }

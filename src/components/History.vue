@@ -36,8 +36,12 @@
                 </b-table-column>
 
                 <b-table-column field="edit">
-                    <div class="button" @click="editEntry()">EDIT</div>
+                    <div class="buttons">
+                        <div class="button" @click="$router.push('/newEntry/'+props.row.entryId)">EDIT</div>
+                        <div class="button is-danger" @click="deleteEntry(props.row.entryId)">DELETE</div>
+                    </div>
                 </b-table-column>
+
             </template>
 
             <template slot="footer">
@@ -88,6 +92,20 @@ export default {
 
     watch: {
         selectedSeason() {
+            this.loadHistoryList();
+        }
+    },
+
+    methods: {
+        calcTotal() {
+            let sum = 0;
+            for(var key in this.data) {
+                sum += parseFloat(this.data[key].distance);
+            }
+            this.total = Math.round(sum);
+        },
+
+        loadHistoryList() {
             this.isLoading = true;
             let startDate = this.$moment(this.selectedSeason.start).format("YYYY-MM-DD");
             let endDate = this.$moment(this.selectedSeason.end).format("YYYY-MM-DD");
@@ -102,16 +120,29 @@ export default {
                     type: 'is-danger'
                 });
             });
-        }
-    },
+        },
 
-    methods: {
-        calcTotal() {
-            let sum = 0;
-            for(var key in this.data) {
-                sum += parseFloat(this.data[key].distance);
-            }
-            this.total = Math.round(sum);
+        deleteEntry(entryId) {
+            this.$dialog.confirm({
+                title: 'Are you sure?',
+                message: 'If you press ok, this entry will be permanently deleted!',
+                onConfirm: () => {
+                    this.$http.get(this.$api+'/api/deleteEntry/'+entryId).then(() => {
+                        this.$toast.open({
+                            duration: 2000,
+                            message: 'Entry deleted!',
+                            type: 'is-success'
+                        });
+                        this.loadHistoryList();
+                    }).catch(() => {
+                        this.$toast.open({
+                            duration: 2000,
+                            message: 'Error deleting entry.',
+                            type: 'is-danger'
+                        });
+                    })
+                }
+            });
         }
     }
 }

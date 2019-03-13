@@ -1,4 +1,5 @@
 <template>
+<div id="scrollContainer">
   <div id="mainContainer">
     
         <nav class="navbar" :class="{'is-fixed-top': $mq==='mobile'}">
@@ -7,11 +8,11 @@
             <router-link to="/leaderboard" class="navbar-item topLevel">Leaderboard</router-link>
             <router-link to="/newEntry" class="navbar-item topLevel" v-if="loggedIn">New Entry</router-link>
 
-            <div class="navbar-item has-dropdown is-hoverable" v-if="loggedIn && $mq==='desktop'">
+            <div class="navbar-item has-dropdown is-hoverable" v-if="loggedIn && $mq==='widescreen'">
               <a class="navbar-link topLevel">{{username}}</a>
               <div class="navbar-dropdown">
                 <router-link to="/settings" class="navbar-item">Settings</router-link>
-                <router-link to="/stats" class="navbar-item">Stats</router-link>
+                <!--<router-link to="/stats" class="navbar-item">Stats</router-link>-->
                 <router-link to="/history" class="navbar-item">Past Entries</router-link>
                 <a class="navbar-item" @click="logout()">Logout</a>
               </div>
@@ -24,10 +25,10 @@
             </div>
           </div>
 
-          <div class="navbar-menu" :class="{'is-active': mobileMenuActive}" v-if="$mq==='mobile'">
+          <div class="navbar-menu" :class="{'is-active': mobileMenuActive}" v-if="$mq!=='widescreen'">
             <div v-if="loggedIn && mobileMenuActive">
               <router-link to="/settings" class="navbar-item">Settings</router-link>
-              <router-link to="/stats" class="navbar-item">Stats</router-link>
+              <!--<router-link to="/stats" class="navbar-item">Stats</router-link>-->
               <router-link to="/history" class="navbar-item">Past Entries</router-link>
               <a class="navbar-item" @click="logout()">Logout</a>
             </div>
@@ -43,6 +44,7 @@
         </b-modal>
 
   </div>
+</div>
 </template>
 
 <script>
@@ -61,6 +63,16 @@ export default {
     }
   },
 
+  watch: {
+
+    //triggered everytime page changes
+    $route (to, from) {
+      this.mobileMenuActive = false;
+      this.trackPageLoad(to, from);
+    }
+
+  },
+
   mounted() {
     this.$root.$on('loggedInEvent', () => {
         this.loggedIn = localStorage.getItem('loggedIn')=='true';
@@ -71,6 +83,15 @@ export default {
     this.$root.$on('showLoginBox', () => {
         this.loginModal = true;
     });
+
+    this.$root.$on('checkLogin', () => {
+      this.$http.get(this.$api+'/api/testLogin').then(() => {
+      }).catch(error => {
+          this.$router.push('/login');
+      });
+    });
+
+    this.updateLoginStatus();
   },
 
   methods: {
@@ -78,6 +99,27 @@ export default {
       localStorage.setItem('loggedIn', false);
       this.$router.push('/');
       this.$root.$emit('loggedInEvent');
+    },
+
+    trackPageLoad(toRoute, fromRoute) {
+      let isLoggedIn = localStorage.getItem('loggedIn') == 'true';
+      this.$http.post(this.$api+'/trackPageLoad', {
+                                                    toPage: toRoute.meta.name,
+                                                    fromPage: fromRoute.meta.name,
+                                                    loggedIn: isLoggedIn,
+                                                    deviceWidth: screen.width,
+                                                    deviceHeight: screen.height
+                                                  });
+    },
+
+    updateLoginStatus() {
+      this.$http.get(this.$api+'/api/testLogin').then(() => {
+        localStorage.setItem('loggedIn', 'true');
+        this.$root.$emit('loggedInEvent');
+      }).catch(error => {
+        localStorage.setItem('loggedIn', 'false');
+        this.$root.$emit('loggedInEvent');
+      });
     }
   }
 }
@@ -98,6 +140,12 @@ export default {
   min-height:calc(100% - 25px);
 
   background-color:white;
+
+}
+
+#scrollContainer {
+  overflow:auto;
+  height:100%;
 }
 
 #mainContainer .navbar {

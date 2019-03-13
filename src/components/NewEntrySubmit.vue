@@ -4,15 +4,16 @@
             <b-field label="Date" horizontal>
                 <b-datepicker placeholder="Select Date..."
                     icon="calendar-today"
-                    v-model="date"
+                    v-model="info.date"
                     required
+                    :max-date="new Date()"
                 ></b-datepicker>
             </b-field>
             
             <div class="trailsList">
                 <p v-if="trailsList.length==0">Select the trails you skied and they will appear here!</p>
                 <div v-for="(trail, i) in trailsList" :key="i" style="padding:5px;">
-                    <span>{{trail.name}}</span>
+                    <span class="trailName" :title="trail.name">{{trail.name}}</span>
                     <div class="is-pulled-right" style="width:100px;">
                         <span class="is-pulled-left">{{trail.distance}} km</span>
                         <span class="is-pulled-right delete" @click="trailsList.splice(i,1)"></span>
@@ -20,7 +21,7 @@
                 </div>
             </div>
 
-            <p class="has-text-right"><b>{{totalDist}} kms</b></p>
+            <p class="has-text-right"><b>{{totalDist}} km</b></p>
 
             <b-field label="Technique" horizontal>
                 <b-select v-model="info.technique" required>
@@ -46,7 +47,7 @@
                 <b-input maxlength="200" type="textarea" v-model="info.comments"></b-input>
             </b-field>
 
-            <button class="button is-primary is-fullwidth">Submit!</button>
+            <button class="button is-primary is-fullwidth" :disabled="isLoading" :class="{'is-loading': isLoading}">Submit!</button>
         </form>
     </div>
 </template>
@@ -65,6 +66,17 @@ export default {
             type: String,
             required: true,
             default: ""
+        },
+
+        entryId: {
+            type: Number,
+            required: true,
+            default: -1
+        },
+
+        entryInfo: {
+            type: Object,
+            required: true
         }
     },
 
@@ -73,12 +85,14 @@ export default {
             date: new Date(),
             info: {
                 date: new Date(),
+                date2: new Date(),
                 system: '',
                 technique: '',
                 comments: ''
             },
 
-            trailSystems: []
+            trailSystems: [],
+            isLoading: false
         }
     },
 
@@ -93,18 +107,19 @@ export default {
         },
 
         filteredDataArray() {
+            if(this.trailSystems.length == 0) return [];
+            if(this.trailSystems == undefined) return [];
             return this.trailSystems.filter((option) => {
                 return option
-                    .toString()
                     .toLowerCase()
-                    .indexOf(this.info.system.toLowerCase()) >= 0
+                    .indexOf(this.system.toLowerCase()) >= 0
             })
         }
     },
 
     watch: {
         system(newVal, oldVal) {
-            this.info.system = newVal;
+            this.info.system = this.system;
         }
     },
 
@@ -119,6 +134,9 @@ export default {
                 type: 'is-danger'
             });
         });
+
+        //load entryInfo
+        this.info = this.entryInfo;
     },
 
     methods: {
@@ -133,20 +151,31 @@ export default {
                 return;
             }
 
-            this.info.date = this.$moment(this.date).format("YYYY-MM-DD");
-            this.$http.post(this.$api+'/api/newEntry', {info: this.info, trails: this.trailsList}).then(response => {
+            this.info.date2 = this.$moment(this.info.date).format("YYYY-MM-DD");
+
+            var editMode;
+            if(this.entryId > -1) editMode = 'editEntry';
+            else editMode = 'newEntry';
+
+            this.isLoading = true;
+            this.$http.post(this.$api+'/api/'+editMode, {info: this.info, trails: this.trailsList, entryId: this.entryId}).then(response => {
+                
+                this.$emit('saved');
                 this.$router.push('/leaderboard');
                 this.$toast.open({
                     duration: 2000,
                     message: 'Your entry has been saved!',
                     type: 'is-success'
                 });
+                this.isLoading = false;
+
             }).catch(() => {
                 this.$toast.open({
                     duration: 2000,
                     message: 'Error saving entry',
                     type: 'is-danger'
                 });
+                this.isLoading = false;
             });
         }
     }
@@ -160,5 +189,13 @@ export default {
     padding:5px;
     max-height:250px;
     overflow-y:auto;
+}
+
+.trailName {
+    display: inline-block;
+    width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

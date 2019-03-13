@@ -1,6 +1,6 @@
 <?php
 
-$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv = Dotenv\Dotenv::create(__DIR__.'/../env');
 $dotenv->load();
 $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS', 'ENV_NAME']);
 

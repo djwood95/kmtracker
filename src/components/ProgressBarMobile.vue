@@ -2,7 +2,7 @@
     <div id="progressBarM" :style="{'width': `${this.width}%`, 'background-color': this.bgColor, 'color': this.bgColor}">
         <span class="is-size-2 placeLabel">{{rowData.place}}</span>
         <span :style="{'color': this.textColor}" class="rightLabel">
-            <p v-if="rowData.username !== undefined">{{rowData.username}}</p>
+            <p v-if="rowData.username !== undefined" v-html="rowData.username"></p>
             <p v-else>{{rowData.colorgroup}}</p>
             <p>{{rowData.kms}} km</p>
         </span>

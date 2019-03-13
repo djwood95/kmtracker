@@ -1,7 +1,7 @@
 <template>
     <div>
-        <LoginBox v-if="!loggedIn && ($mq==='desktop' || mobileLoginBoxActive)"></LoginBox>
-        <StatBox></StatBox>
+        <LoginBox v-if="!loggedIn && ($mq!=='mobile' || mobileLoginBoxActive)"></LoginBox>
+        <!--<StatBox></StatBox>-->
         <div>
             <p class="sidebarHeader">Trail Conditions</p>
             <p>Want to get out skiing, but don't know if the trails are groomed? Check out the sites below for trail conditions:</p>

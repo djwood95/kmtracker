@@ -95,12 +95,13 @@ export default {
     methods: {
         submitNewAccount() {
             //check that passwords match
-            if(this.password1 !== this.password2) {
+            if(this.info.password1 !== this.info.password2) {
                 this.$toast.open({
                     duration: 3000,
                     message: 'Passwords do not match. Please try again.',
                     type: 'is-danger'
                 });
+                return;
             }
 
             //check that this isn't a duplicate account
@@ -110,6 +111,7 @@ export default {
                     message: 'This username is already taken. Please try again',
                     type: 'is-danger'
                 });
+                return;
             }
 
             this.$http.post(this.$api+'/newAccount', {info: this.info}).then(response => {
@@ -145,9 +147,11 @@ export default {
             if(this.usernameList.includes(this.info.username)) {
                 this.usernameErrorMsg = "This username has already been taken.";
                 this.usernameStatus = 'is-danger';
+                return false;
             } else {
                 this.usernameErrorMsg = "";
                 this.usernameStatus = 'is-success';
+                return true;
             }
         },
 
