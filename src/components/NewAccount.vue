@@ -96,7 +96,7 @@ export default {
         submitNewAccount() {
             //check that passwords match
             if(this.info.password1 !== this.info.password2) {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 3000,
                     message: 'Passwords do not match. Please try again.',
                     type: 'is-danger'
@@ -106,7 +106,7 @@ export default {
 
             //check that this isn't a duplicate account
             if(this.usernameList.includes(this.username)) {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 3000,
                     message: 'This username is already taken. Please try again',
                     type: 'is-danger'
@@ -115,7 +115,7 @@ export default {
             }
 
             this.$http.post(this.$api+'/newAccount', {info: this.info}).then(response => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 3000,
                     message: 'Your account was created!',
                     type: 'is-success'
@@ -123,7 +123,7 @@ export default {
                 this.$router.push('/');
             }).catch(() => {
                 this.isLoading = false;
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error creating account. Please try again.',
                     type: 'is-danger'
@@ -135,7 +135,7 @@ export default {
             this.$http.get(this.$api+'/getUsernameList').then(response => {
                 this.usernameList = response.data;
             }).catch(() => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading new account page. Please try again',
                     type: 'is-danger'

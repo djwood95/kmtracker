@@ -27,7 +27,7 @@
 
             </b-field>
 
-            <br v-if="$mq==='mobile'"/>
+            <br/>
 
             <div class="buttons">
                 <div class="button is-primary" :class="{'is-outlined': dateMode!=='thisSeason'}" v-if="!groupStandingsMode" @click="regStandings()">This Season</div>
@@ -51,28 +51,26 @@
 
         <div>
             <b-table :data="filteredList" :mobile-cards="false" v-if="$mq!=='mobile'" narrowed>
-                <template slot-scope="props">
-                    <b-table-column field="place" label="Place" width="40" :visible="$mq!=='mobile' && !groupStandingsMode">
+                    <b-table-column field="place" label="Place" width="40" :visible="$mq!=='mobile' && !groupStandingsMode" v-slot="props">
                         {{props.row.place}}
                     </b-table-column>
 
-                    <b-table-column field="username" label="Name" width="200" :visible="!groupStandingsMode">
+                    <b-table-column field="username" label="Name" width="200" :visible="!groupStandingsMode" v-slot="props">
                         <span v-html="props.row.username"></span>
                     </b-table-column>
 
-                    <b-table-column field="colorgroup" label="Group" width="100" :visible="$mq!=='mobile'">
+                    <b-table-column field="colorgroup" label="Group" width="100" :visible="$mq!=='mobile'" v-slot="props">
                         {{props.row.colorgroup}}
                     </b-table-column>
 
-                    <b-table-column field="kms" label="Kilometers">
-                        <ProgressBar style="display:block;" :colorgroup="props.row.colorgroup" :value="props.row.kms" :max="filteredList[0].kms"></ProgressBar>
+                    <b-table-column field="kms" label="Kilometers" v-slot="props">
+                        <progress-bar style="display:block;" :colorgroup="props.row.colorgroup" :value="props.row.kms" :max="filteredList[0].kms"></progress-bar>
                     </b-table-column>
 
-                    <b-table-column class="has-text-right">
+                    <b-table-column class="has-text-right" v-slot="props">
                         <span style="margin-right:3px;">{{props.row.kms}} km</span>
                         <span class="is-size-7" v-if="!groupStandingsMode">({{props.row.lastUpdate}})</span>
                     </b-table-column>
-                </template>
 
                 <template slot="footer">
                     <div class="has-text-right">
@@ -82,7 +80,7 @@
             </b-table>
 
             <div v-if="$mq==='mobile'">
-                <ProgressBarMobile v-for="(row, i) in filteredList" :key="i" :rowData="row" :max="filteredList[0].kms"></ProgressBarMobile>
+                <progress-bar-mobile v-for="(row, i) in filteredList" :key="i" :rowData="row" :max="filteredList[0].kms"></progress-bar-mobile>
             </div>
         </div>
     </div>
@@ -156,7 +154,7 @@ export default {
                 this.isLoading = false;
             }).catch(error => {
                 this.isLoading = false;
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading group standings',
                     type: 'is-danger'
@@ -180,7 +178,7 @@ export default {
                 },500);
             }).catch(error => {
                 this.isLoading = false;
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading leaderboard',
                     type: 'is-danger'
@@ -191,7 +189,6 @@ export default {
         updateTotal() {
             let sum = 0;
             for(var key in this.filteredList) {
-                console.log(key);
                 sum += parseFloat(this.filteredList[key].kms);
             }
             this.total = Math.round(sum);
@@ -212,7 +209,7 @@ export default {
                 this.dateMode = 'thisWeek';
             }).catch(error => {
                 this.isLoading = false;
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading leaderboard',
                     type: 'is-danger'
@@ -232,7 +229,7 @@ export default {
                 this.dateChanged = false;
             }).catch(error => {
                 this.isLoading = false;
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading leaderboard',
                     type: 'is-danger'
@@ -249,7 +246,7 @@ export default {
                 this.dateMode = 'lifetime';
             }).catch(error => {
                 this.isLoading = false;
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading leaderboard',
                     type: 'is-danger'
@@ -266,7 +263,7 @@ export default {
                 this.dateMode = 'allSeasons';
             }).catch(error => {
                 this.isLoading = false;
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading leaderboard',
                     type: 'is-danger'

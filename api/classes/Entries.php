@@ -37,8 +37,8 @@ class Entries extends Mapper {
         //Get username
         $username = self::getUsername($userId);
 
-        $stmt = $this->db->prepare("INSERT INTO entries (trail,distance,username,system,date,comments,type, entryID)
-                                    VALUES (:trail, :distance, :username, :system, :date, :comments, :type, :entryId)");
+        $stmt = $this->db->prepare("INSERT INTO entries (trail,distance,username,`system`,`date`,comments,`type`, entryID, timestamp2)
+                                    VALUES (:trail, :distance, :username, :system, :date, :comments, :type, :entryId, '')");
 
         foreach ($trailsList as $trail) {
             $stmt->execute([

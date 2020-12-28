@@ -114,7 +114,7 @@ export default {
                 this.calcTotal();
                 this.isLoading = false;
             }).catch(() => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading history data.',
                     type: 'is-danger'
@@ -123,19 +123,19 @@ export default {
         },
 
         deleteEntry(entryId) {
-            this.$dialog.confirm({
+            this.$buefy.dialog.confirm({
                 title: 'Are you sure?',
                 message: 'If you press ok, this entry will be permanently deleted!',
                 onConfirm: () => {
                     this.$http.get(this.$api+'/api/deleteEntry/'+entryId).then(() => {
-                        this.$toast.open({
+                        this.$buefy.toast.open({
                             duration: 2000,
                             message: 'Entry deleted!',
                             type: 'is-success'
                         });
                         this.loadHistoryList();
                     }).catch(() => {
-                        this.$toast.open({
+                        this.$buefy.toast.open({
                             duration: 2000,
                             message: 'Error deleting entry.',
                             type: 'is-danger'

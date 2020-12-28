@@ -43,7 +43,7 @@ export default {
             this.groupListLoading = false;
             this.selectedGroup = response.data;
         }).catch(() => {
-            this.$toast.open({
+            this.$buefy.toast.open({
                 duration: 2000,
                 message: 'Error loading color group.',
                 type: 'is-danger'
@@ -54,13 +54,13 @@ export default {
     methods: {
         saveNewGroup() {
             this.$http.post(this.$api+'/api/settings/saveColorGroup', {colorgroup: this.selectedGroup}).then(response => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'New color group saved!',
                     type: 'is-success'
                 });
             }).catch(() => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error saving color group.',
                     type: 'is-danger'
@@ -71,7 +71,7 @@ export default {
         saveNewPass() {
             //check that passwords match
             if(this.password1 != this.password2) {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Passwords do not match.',
                     type: 'is-danger'
@@ -81,7 +81,7 @@ export default {
 
             //check length requirement
             if(this.password1.length < 6 || this.password1.length > 100) {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Password must be between 6 and 100 characters.',
                     type: 'is-danger'
@@ -90,13 +90,13 @@ export default {
             }
 
             this.$http.post(this.$api+'/api/settings/saveNewPass', {newPass: this.password1}).then(response => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'New password saved!',
                     type: 'is-success'
                 });
             }).catch(() => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error saving password.',
                     type: 'is-danger'

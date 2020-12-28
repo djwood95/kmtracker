@@ -54,7 +54,7 @@
 
             <div class="column content" id="homeSidebar2" v-if="$mq==='widescreen'">
                 <p class="sidebarHeader">Submit Your Entry!</p>
-                <NewEntrySubmit :trailsList.sync="trailsList" :system="selectedSystem" :entry-id="entryId" :entry-info="info" @saved="this.isUnsaved=false"></NewEntrySubmit>
+                <new-entry-submit :trailsList.sync="trailsList" :system="selectedSystem" :entry-id="entryId" :entry-info="info" @saved="entrySaved()"></new-entry-submit>
             </div>
         </div>
 
@@ -80,7 +80,7 @@
                         :trails-list.sync="trailsList"
                         :system="selectedSystem" 
                         :entry-info="info"
-                        @saved="isUnsaved=false"
+                        @saved="entrySaved()"
                     >
                     </new-entry-submit>
                 </div>
@@ -122,13 +122,7 @@ export default {
             isUnsaved: false
         }
     },
-/*
-    created() {
-        window.addEventListener('beforeunload', function (event) {
-            console.log('leaving') // logs to my logger
-        }, false);
-    },
-*/
+
     mounted() {
 
         //check login before doing anything else
@@ -161,7 +155,7 @@ export default {
         if(to.path == "/login") next();
         else if(!this.isUnsaved) next();
         else {
-            this.$dialog.confirm({
+            this.$buefy.dialog.confirm({
                 title: 'Are you sure?',
                 message: 'If you leave this page, your entry will not be saved.',
                 onConfirm: () => {
@@ -220,12 +214,22 @@ export default {
                 this.trailsList = response.data.trailsList;
                 this.isLoading = false;
             }).catch(() => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error loading entry',
                     type: 'is-danger'
                 });
                 this.isLoading = false;
+            });
+        },
+
+        entrySaved() {
+            this.isUnsaved = false;
+            this.$router.push('/leaderboard');
+            this.$buefy.toast.open({
+                duration: 2000,
+                message: 'Your entry has been saved!',
+                type: 'is-success'
             });
         }
     }

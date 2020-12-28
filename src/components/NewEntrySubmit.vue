@@ -128,7 +128,7 @@ export default {
         this.$http.get(this.$api+'/getTrailSystems').then(response => {
             this.trailSystems = response.data;
         }).catch(() => {
-            this.$toast.open({
+            this.$buefy.toast.open({
                 duration: 2000,
                 message: 'Error loading trail systems',
                 type: 'is-danger'
@@ -143,7 +143,7 @@ export default {
         submit() {
             //must have at least 1 trail
             if(this.trailsList.length == 0) {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 3000,
                     message: 'You must have at least 1 trail',
                     type: 'is-danger'
@@ -159,18 +159,10 @@ export default {
 
             this.isLoading = true;
             this.$http.post(this.$api+'/api/'+editMode, {info: this.info, trails: this.trailsList, entryId: this.entryId}).then(response => {
-                
                 this.$emit('saved');
-                this.$router.push('/leaderboard');
-                this.$toast.open({
-                    duration: 2000,
-                    message: 'Your entry has been saved!',
-                    type: 'is-success'
-                });
                 this.isLoading = false;
-
             }).catch(() => {
-                this.$toast.open({
+                this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Error saving entry',
                     type: 'is-danger'

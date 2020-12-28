@@ -75,7 +75,7 @@ export default {
   methods: {
     forgotPass() {
       alert('test');
-      this.$dialog.alert('Coming soon! For now, please email djwood@mtu.edu with your current username using the email associated with your account.');
+      this.$buefy.dialog.alert('Coming soon! For now, please email djwood@mtu.edu with your current username using the email associated with your account.');
     }
   }
 }
