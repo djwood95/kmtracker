@@ -77,13 +77,10 @@ $app->get('/leaderboard/groupStandings', function (Request $request, Response $r
     return $response->withJson($results);
 });
 
-$app->get('/getUsernameList', function (Request $request, Response $response, array $args) {
-
+$app->post('/usernameExists', function (Request $request, Response $response, array $args) {
     $util = new Util($this->db);
-    $results = $util->getUsernameList();
-    
-    return $response->withJson($results);
-
+    $username = $request->getParam('username');
+    return $response->withJson(['usernameExists' => $util->usernameExists($username)]);
 });
 
 $app->post('/newAccount', function (Request $request, Response $response, array $args) {
@@ -92,8 +89,8 @@ $app->post('/newAccount', function (Request $request, Response $response, array 
     $util = new Util($this->db);
     $results = $util->newAccount($info);
 
-    if($results) return $response->withStatus(200);
-    else return $response->withStatus(500);
+    if($results == 'success') return $response->withStatus(200);
+    else return $response->withJson($results)->withStatus(500);
 });
 
 $app->get('/getTrailSystems', function (Request $request, Response $response, array $args) {

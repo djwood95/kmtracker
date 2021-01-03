@@ -1,8 +1,16 @@
 <template>
     <div>
-        <form action="" method="post" @submit.prevent="submit()">
+        <b-notification v-if="errors.length > 0" type="is-danger" ref="errorBox">
+            Please fix the following errors to continue:
+            <ul>
+                <li v-for="(msg,i) in errors" :key="i">{{ msg }}</li>
+            </ul>
+        </b-notification>
+
+        <div v-if="info !== null">
             <b-field label="Date" horizontal>
                 <b-datepicker placeholder="Select Date..."
+                    id="date-picker"
                     icon="calendar-today"
                     v-model="info.date"
                     required
@@ -11,11 +19,11 @@
             </b-field>
             
             <div class="trailsList">
-                <p v-if="trailsList.length==0">Select the trails you skied and they will appear here!</p>
-                <div v-for="(trail, i) in trailsList" :key="i" style="padding:5px;">
+                <p v-if="trailsList.length === 0">Select the trails you skied and they will appear here!</p>
+                <div v-for="(trail, i) in trailsList" :key="i" style="padding:5px;" class="trail-list-item">
                     <span class="trailName" :title="trail.name">{{trail.name}}</span>
                     <div class="is-pulled-right" style="width:100px;">
-                        <span class="is-pulled-left">{{trail.distance}} km</span>
+                        <span class="trailDist is-pulled-left">{{trail.distance}} km</span>
                         <span class="is-pulled-right delete" @click="trailsList.splice(i,1)"></span>
                     </div>
                 </div>
@@ -24,7 +32,7 @@
             <p class="has-text-right"><b>{{totalDist}} km</b></p>
 
             <b-field label="Technique" horizontal>
-                <b-select v-model="info.technique" required>
+                <b-select id="technique" v-model="info.technique" required>
                     <option value='skate'>Skate</option>
                     <option value='classic'>Classic</option>
                     <option value='backcountry'>Backcountry</option>
@@ -33,6 +41,7 @@
 
             <b-field label="Trail System">
                 <b-autocomplete
+                    id="trail-system-input"
                     v-model="info.system"
                     :data="filteredDataArray"
                     placeholder="e.g. mtu"
@@ -44,11 +53,11 @@
             </b-field>
 
             <b-field label="Comments">
-                <b-input maxlength="200" type="textarea" v-model="info.comments"></b-input>
+                <b-input id="comments" maxlength="200" type="textarea" v-model="info.comments"></b-input>
             </b-field>
 
-            <button class="button is-primary is-fullwidth" :disabled="isLoading" :class="{'is-loading': isLoading}">Submit!</button>
-        </form>
+            <b-button @click="submit()" type="is-primary" expanded :disabled="isLoading" :loading="isLoading">Submit!</b-button>
+        </div>
     </div>
 </template>
 
@@ -82,17 +91,10 @@ export default {
 
     data() {
         return {
-            date: new Date(),
-            info: {
-                date: new Date(),
-                date2: new Date(),
-                system: '',
-                technique: '',
-                comments: ''
-            },
-
+            info: null,
             trailSystems: [],
-            isLoading: false
+            isLoading: false,
+            errors: []
         }
     },
 
@@ -119,7 +121,18 @@ export default {
 
     watch: {
         system(newVal, oldVal) {
-            this.info.system = this.system;
+            if (newVal.length > 0) {
+                this.info.system = newVal;
+            }
+        },
+
+        info: {
+            handler(newVal, oldVal) {
+                if (oldVal !== null) {
+                    this.$emit('info-changed');
+                }
+            },
+            deep: true
         }
     },
 
@@ -141,13 +154,29 @@ export default {
 
     methods: {
         submit() {
-            //must have at least 1 trail
-            if(this.trailsList.length == 0) {
-                this.$buefy.toast.open({
-                    duration: 3000,
-                    message: 'You must have at least 1 trail',
-                    type: 'is-danger'
-                });
+            this.errors = [];
+            if (!this.$moment(this.info.date).isValid()) {
+                this.errors.push('Date format is invalid');
+            }
+
+            if (this.trailsList.length === 0) {
+               this.errors.push('You must have at least one trail'); 
+            }
+
+            if (this.info.technique === '') {
+                this.errors.push('Technique is a required field');
+            }
+
+            if (this.info.system.length < 1 || this.info.system.length > 100) {
+                this.errors.push('Trail system must be between 1 and 100 characters');
+            }
+
+            if (this.info.comments.length > 200) {
+                this.errors.push('Comments must be less than 200 characters');
+            }
+
+            if (this.errors.length > 0) {
+                this.$nextTick(() => this.$refs.errorBox.$el.scrollIntoView());
                 return;
             }
 

@@ -2,9 +2,16 @@
     <div class="content section">
         <h2 class="has-text-centered">New Account</h2>
 
+            <b-notification type="is-danger" v-if="errors.length > 0">
+                Please fix the following errors to continue:
+                <ul>
+                    <li v-for="(msg,i) in errors" :key="i">{{ msg }}</li>
+                </ul>
+            </b-notification>
+
             <form action="" method="post" @submit.prevent="submitNewAccount()">
                 <b-field label="Username" horizontal :message="usernameErrorMsg" :type="usernameStatus">
-                    <b-input 
+                    <b-input id="username"
                         minlength="3"
                         maxlength="15" 
                         v-model="info.username" 
@@ -14,27 +21,25 @@
                 </b-field>
 
                 <b-field label="Password" horizontal :type="passwordStatus">
-                    <b-input type="password" required password-reveal
+                    <b-input id="password1" type="password" required password-reveal
                         v-model="info.password1"
                         placeholder="password"
                         minlength="6"
-                        maxlength="100"
-                        @change.native="checkPasswords()">
+                        maxlength="100">
                     </b-input>
                 </b-field>
 
                 <b-field label="Repeat Password" horizontal :message="passwordErrorMsg" :type="passwordStatus">
-                    <b-input type="password" required password-reveal
+                    <b-input id="password2" type="password" required password-reveal
                         v-model="info.password2"
                         placeholder="repeat password"
                         minlength="6"
-                        maxlength="100"
-                        @change.native="checkPasswords()">
+                        maxlength="100">
                     </b-input>
                 </b-field>
 
                 <b-field label="Email" horizontal message="required for password recovery">
-                    <b-input type="email" required
+                    <b-input id="email" type="email" required
                         v-model="info.email"
                         placeholder="email"
                         minlength="6"
@@ -43,7 +48,7 @@
                 </b-field>
 
                 <b-field label="Color Group" horizontal>
-                    <b-select placeholder="Select a Color Group" v-model="info.selectedGroup">
+                    <b-select id="colorGroup" placeholder="Select a Color Group" v-model="info.selectedGroup">
                         <option
                             v-for="(group,i) in groupList"
                             :value="group.abbr"
@@ -56,7 +61,7 @@
                 <br/>
 
                 <div class="buttons is-centered">
-                    <button class="button" type="button" @click="$router.go(-1)">Cancel</button>
+                    <button class="button" type="button" @click="$router.push('/')">Cancel</button>
                     <button class="button is-primary">Create Account</button>
                 </div>
             </form>
@@ -76,11 +81,9 @@ export default {
             },
 
             groupList2: Object.values(this.$groups),
-            usernameList: [],
-            usernameErrorMsg: '',
-            usernameStatus: '',
-            passwordErrorMsg: '',
-            passwordStatus: ''
+            usernameExists: null,
+            isPasswordValid: null,
+            errors: []
         }
     },
 
@@ -89,30 +92,62 @@ export default {
             return this.groupList2.filter(item => {
                 return item.name !== 'All';
             });
+        },
+
+        usernameErrorMsg() {
+            if (this.usernameExists === null) {
+                return '';
+            } else if (this.usernameExists) {
+                return 'This username has already been taken!';
+            } else if (this.info.username.length <= 3 || this.info.username.length > 15) {
+                return 'Username is required and must be between 4 and 15 characters';
+            } else {
+                return '';
+            }
+        },
+
+        usernameStatus() {
+            if (this.usernameExists === null) return '';
+            if (this.usernameErrorMsg.length === 0) return 'is-success';
+            if (this.usernameErrorMsg.length > 0) return 'is-danger';
+        },
+
+        passwordErrorMsg() {
+            if (this.info.password1.length === 0 && this.info.password2.length === 0) {
+                return '';
+            } else if (this.info.password1.length <= 5 || this.info.password1.length > 100) {
+                return 'Password is required and must be between 6 and 100 characters';
+            } else if (this.info.password1 !== this.info.password2) {
+                return 'Passwords do not match!';
+            } else {
+                return '';
+            }
+        },
+
+        passwordStatus() {
+            if (this.info.password1.length === 0 && this.info.password2.length === 0) return '';
+            if (this.passwordErrorMsg.length === 0) return 'is-success';
+            if (this.passwordErrorMsg.length > 0) return 'is-danger';
         }
     },
 
     methods: {
         submitNewAccount() {
-            //check that passwords match
-            if(this.info.password1 !== this.info.password2) {
-                this.$buefy.toast.open({
-                    duration: 3000,
-                    message: 'Passwords do not match. Please try again.',
-                    type: 'is-danger'
-                });
-                return;
+            this.errors = [];
+
+            if (this.passwordErrorMsg.length > 0) {
+                this.errors.push(this.passwordErrorMsg);
             }
 
-            //check that this isn't a duplicate account
-            if(this.usernameList.includes(this.username)) {
-                this.$buefy.toast.open({
-                    duration: 3000,
-                    message: 'This username is already taken. Please try again',
-                    type: 'is-danger'
-                });
-                return;
+            if (this.info.password1.length === 0 || this.info.password2.length === 0) {
+                this.errors.push('Password is required');
             }
+
+            if (this.usernameErrorMsg.length > 0) {
+                this.errors.push(this.usernameErrorMsg);
+            }
+
+            if (this.errors.length > 0) return;
 
             this.$http.post(this.$api+'/newAccount', {info: this.info}).then(response => {
                 this.$buefy.toast.open({
@@ -121,54 +156,23 @@ export default {
                     type: 'is-success'
                 });
                 this.$router.push('/');
-            }).catch(() => {
+            }).catch((error) => {
+                this.$root.$emit('handle-error', error, 'Sorry, there was an error creating your account. Please try again.');
                 this.isLoading = false;
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error creating account. Please try again.',
-                    type: 'is-danger'
-                });
             });
         },
 
-        getUsernameList() {
-            this.$http.get(this.$api+'/getUsernameList').then(response => {
-                this.usernameList = response.data;
-            }).catch(() => {
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error loading new account page. Please try again',
-                    type: 'is-danger'
-                });
-            })
-        },
-
         checkUsername() {
-            if(this.usernameList.includes(this.info.username)) {
-                this.usernameErrorMsg = "This username has already been taken.";
-                this.usernameStatus = 'is-danger';
-                return false;
-            } else {
-                this.usernameErrorMsg = "";
-                this.usernameStatus = 'is-success';
-                return true;
-            }
-        },
-
-        checkPasswords() {
-            if(this.info.password1 != this.info.password2) {
-                this.passwordErrorMsg = "Passwords do not match";
-                this.passwordStatus = 'is-danger';
-            } else {
-                this.passwordErrorMsg = "";
-                this.passwordStatus = 'is-success';
-            }
+            this.$http.post(`${this.$api}/usernameExists`, { username: this.info.username }).then((response) => {
+                this.usernameExists = response.data.usernameExists;
+            }).catch((error) => {
+                this.$root.$emit('handleError', error);
+            });
         }
     },
 
     mounted() {
         this.groupList2 = Object.values(this.$groups);
-        this.getUsernameList();
     }
 }
 </script>

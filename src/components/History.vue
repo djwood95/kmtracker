@@ -14,35 +14,32 @@
         </b-field>
 
         <b-table :data="data">
-            <template slot-scope="props">
-                <b-table-column field="date" label="Date">
-                    {{props.row.date | moment("MMM D, YYYY")}}
-                </b-table-column>
+            <b-table-column field="date" label="Date" v-slot="props">
+                {{props.row.date | moment("MMM D, YYYY")}}
+            </b-table-column>
 
-                <b-table-column field="location" label="Location">
-                    {{props.row.system}}
-                </b-table-column>
+            <b-table-column field="location" label="Location" v-slot="props">
+                {{props.row.system}}
+            </b-table-column>
 
-                <b-table-column field="distance" label="Distance">
-                    {{parseFloat(props.row.distance).toFixed(1)}}
-                </b-table-column>
+            <b-table-column field="distance" label="Distance" v-slot="props">
+                {{parseFloat(props.row.distance).toFixed(1)}}
+            </b-table-column>
 
-                <b-table-column field="technique" label="Technique">
-                    {{props.row.technique}}
-                </b-table-column>
+            <b-table-column field="technique" label="Technique" v-slot="props">
+                {{props.row.technique}}
+            </b-table-column>
 
-                <b-table-column field="comments" label="Comments">
-                    {{props.row.comments}}
-                </b-table-column>
+            <b-table-column field="comments" label="Comments" v-slot="props">
+                {{props.row.comments}}
+            </b-table-column>
 
-                <b-table-column field="edit">
-                    <div class="buttons">
-                        <div class="button" @click="$router.push('/newEntry/'+props.row.entryId)">EDIT</div>
-                        <div class="button is-danger" @click="deleteEntry(props.row.entryId)">DELETE</div>
-                    </div>
-                </b-table-column>
-
-            </template>
+            <b-table-column field="edit" v-slot="props">
+                <div class="buttons">
+                    <div class="button" @click="$router.push('/newEntry/'+props.row.entryId)">EDIT</div>
+                    <div class="button is-danger" @click="deleteEntry(props.row.entryId)">DELETE</div>
+                </div>
+            </b-table-column>
 
             <template slot="footer">
                 <div class="has-text-centered">

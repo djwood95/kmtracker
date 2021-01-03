@@ -1,16 +1,16 @@
 <template>
-    <div class="modal-card" style="width: auto">
+    <div class="modal-card">
         <header class="modal-card-head">
             <p class="modal-card-title">Login</p>
         </header>
         <section class="modal-card-body">
             <b-notification type="is-danger" :auto-close="true" :duration="3500" :active.sync="badPassMsgActive">Incorrect username or password!</b-notification>
             <b-field label="Username">
-                <b-input v-model="username" required></b-input>
+                <b-input id="username" v-model="username" required></b-input>
             </b-field>
 
             <b-field label="Password">
-                <b-input type="password" required password-reveal
+                <b-input id="password" type="password" required password-reveal
                     v-model="password"
                     placeholder="password">
                 </b-input>

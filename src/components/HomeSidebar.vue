@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LoginBox v-if="!loggedIn && ($mq!=='mobile' || mobileLoginBoxActive)"></LoginBox>
+        <login-box v-if="!loggedIn && ($mq !== 'mobile' || mobileLoginBoxActive)"></login-box>
         <!--<StatBox></StatBox>-->
         <div>
             <p class="sidebarHeader">Trail Conditions</p>

@@ -88,15 +88,27 @@ class Util extends Mapper {
 
 		return $results;
 	}
+
+	/**
+	 * Returns true if the given username is valid
+	 * Returns false if the given username is already taken/or invalid
+	 */
+	public function usernameExists($username) {
+		$stmt = $this->db->prepare("SELECT username FROM users WHERE username=:username");
+		$stmt->execute([ 'username' => $username ]);
+
+		return $stmt->rowCount() > 0;
+	}
 	
 	public function newAccount($info) {
 
 		//check for duplicate username
-		$usernameList = self::getUsernameList();
-		if(in_array($info['username'], $usernameList)) return false;
+		if (self::usernameExists($info['username'])) return 'username already exists';
+		if (strlen($info['username']) <= 3 || strlen($info['username']) > 15) return 'username must be between 3 and 15 characters';
 
 		//check that password is valid
-		if(strlen($info['password1']) < 6 || strlen($info['password1']) > 100) return false;
+		if(strlen($info['password1']) < 6 || strlen($info['password1']) > 100) return 'password must be between 7 and 100 characters';
+		if ($info['password1'] != $info['password2']) return 'passwords do not match!';
 
 		$stmt = $this->db->prepare("INSERT INTO users (username, password2, email, colorgroup)
 									VALUES (:username, :pass, :email, :colorgroup)");
@@ -108,7 +120,7 @@ class Util extends Mapper {
 			'colorgroup' => $info['selectedGroup']
 		]);
 
-		return true;
+		return 'success';
 	}
 
 	public function getColorGroup($userId) {

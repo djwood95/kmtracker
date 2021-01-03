@@ -8,7 +8,7 @@
             <router-link to="/leaderboard" class="navbar-item topLevel">Leaderboard</router-link>
             <router-link to="/newEntry" class="navbar-item topLevel" v-if="loggedIn">New Entry</router-link>
 
-            <div class="navbar-item has-dropdown is-hoverable" v-if="loggedIn && $mq==='widescreen'">
+            <div class="navbar-item has-dropdown is-hoverable" v-if="loggedIn && $mq === 'desktop'">
               <a class="navbar-link topLevel">{{username}}</a>
               <div class="navbar-dropdown">
                 <router-link to="/settings" class="navbar-item">Settings</router-link>
@@ -25,7 +25,7 @@
             </div>
           </div>
 
-          <div class="navbar-menu" :class="{'is-active': mobileMenuActive}" v-if="$mq!=='widescreen'">
+          <div class="navbar-menu" :class="{'is-active': mobileMenuActive}" v-if="$mq !== 'desktop'">
             <div v-if="loggedIn && mobileMenuActive">
               <router-link to="/settings" class="navbar-item">Settings</router-link>
               <!--<router-link to="/stats" class="navbar-item">Stats</router-link>-->
@@ -89,6 +89,19 @@ export default {
       }).catch(error => {
           this.$router.push('/login');
       });
+    });
+
+    this.$root.$on('handle-error', (error, msg = '') => {
+      if (msg.length === 0) msg = 'Sorry, there was an error.';
+      this.$buefy.toast.open({
+        duration: 5000,
+        message: msg,
+        type: 'is-danger'
+      });
+
+      if (this.$env != "production") {
+        console.log(error);
+      }
     });
 
     this.updateLoginStatus();

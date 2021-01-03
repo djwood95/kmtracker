@@ -1,22 +1,26 @@
 <template>
-    <div>
+    <div class="sidebar-box">
         <p class="sidebarHeader">Login</p>
-        <b-notification type="is-danger" :auto-close="true" :duration="3500" :active.sync="badPassMsgActive">Incorrect username or password!</b-notification>
-        <b-field>
-            <b-input name="username" v-model="username" placeholder="Username/Email" expanded @keypress.enter="checkLogin()"></b-input>
+        <b-notification type="is-danger" :auto-close="true" :duration="5000" :active.sync="badPassMsgActive">Incorrect username or password!</b-notification>
+        <b-field label="Username" label-position="on-border">
+            <b-input id="username" name="username" v-model="username" expanded @keypress.enter="checkLogin()"></b-input>
         </b-field>
-        <b-field>
-            <b-input type="password" v-model="password" placeholder="Password" @keypress.enter.native="checkLogin()"></b-input>
+        <b-field label="Password" label-position="on-border">
+            <b-input id="password" type="password" v-model="password" @keypress.enter.native="checkLogin()"></b-input>
         </b-field>
 
-        <div class="buttons has-addons" style="width:100%;margin-bottom:10px;">
-            <div class="button is-primary is-fullwidth" @click="checkLogin()">Login</div>
-            <div class="button is-small is-info is-outlined is-expanded" @click="$router.push('/newAccount')">New Account</div>
-            <div class="button is-small is-info is-outlined is-expanded" @click="$router.push('/forgotPassword')">Forgot Password</div>
+        <b-button type="is-primary is-light" expanded id="login-btn" @click="checkLogin()">Login</b-button>
+        <div class="columns is-variable is-2 mt-1">
+            <div class="column">
+                <b-button size="is-small" type="is-light" expanded @click="$router.push('/newAccount')">New Account</b-button>
+            </div>
+            <div class="column">
+                <b-button size="is-small" type="is-light" expanded @click="$router.push('/forgotPassword')">Forgot Password</b-button>
+            </div>
         </div>
 
         <b-modal :active.sync="newAccountBoxActive" has-modal-card>
-            <NewAccount></NewAccount>
+            <new-account></new-account>
         </b-modal>
     </div>
 </template>
@@ -72,3 +76,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    .sidebar-box {
+        margin-bottom: 15px;
+    }
+</style>
