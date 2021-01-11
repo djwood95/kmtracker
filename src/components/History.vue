@@ -1,9 +1,9 @@
 <template>
-    <div class="section content has-text-centered">
+    <div class="section content">
         <h2 class="has-text-centered">Past Entries</h2>
 
-        <b-field label="Season" horizontal>
-            <b-select placeholder="Select a Season" v-model="selectedSeason" :loading="isLoading">
+        <b-field label="Season" label-position="on-border">
+            <b-select id="season" placeholder="Select a Season" v-model="selectedSeason" :loading="isLoading">
                 <option
                     v-for="(season,i) in seasonList"
                     :value="season"
@@ -41,14 +41,26 @@
                 </div>
             </b-table-column>
 
+            <template slot="empty">
+                <section class="section">
+                    <div class="content has-text-grey has-text-centered">
+                        <p>
+                            <b-icon
+                                icon="frown"
+                                size="is-large">
+                            </b-icon>
+                        </p>
+                        <p>Nothing here.</p>
+                    </div>
+                </section>
+            </template>
+
             <template slot="footer">
                 <div class="has-text-centered">
                     <strong>Total Distance: </strong>{{total}} km
                 </div>
             </template>
         </b-table>
-
-        <p v-if="data.length==0">No Data</p>
     </div>
 </template>
 
@@ -99,7 +111,7 @@ export default {
             for(var key in this.data) {
                 sum += parseFloat(this.data[key].distance);
             }
-            this.total = Math.round(sum);
+            this.total = this._.round(sum,1);
         },
 
         loadHistoryList() {
@@ -123,6 +135,7 @@ export default {
             this.$buefy.dialog.confirm({
                 title: 'Are you sure?',
                 message: 'If you press ok, this entry will be permanently deleted!',
+                type: 'is-danger',
                 onConfirm: () => {
                     this.$http.get(this.$api+'/api/deleteEntry/'+entryId).then(() => {
                         this.$buefy.toast.open({

@@ -14,7 +14,9 @@ import ForgotPass from './components/ForgotPass.vue'
 
 import 'buefy/dist/buefy.css'
 
-Vue.use(Buefy)
+Vue.use(Buefy, {
+  defaultIconPack: 'fas'
+})
 Vue.use(VueRouter)
 
 Vue.config.productionTip = false
@@ -23,7 +25,7 @@ const routes = [
   { path: '/', component: Home, meta: {name: 'home', public: true} },
   { path: '/home', component: Home, meta: {name: 'home', public: true} },
   { path: '/leaderboard', component: Leaderboard, props: {header: true}, meta: {name: 'leaderboard', public: true} },
-  { path: '/leaderboard/noHeader', component: Leaderboard, props: {header: false}, meta: {name: 'leaderboard-NH', public: true} },
+  { path: '/leaderboard/noHeader', component: Leaderboard, props: {header: false}, meta: {name: 'leaderboard-NH', public: true, header: false} },
   { path: '/newAccount', component: NewAccount, meta: {name: 'newAccount', public: true} },
   { path: '/settings', component: Settings, meta: {name: 'settings', public: false} },
   { path: '/history', component: History, meta: {name: 'history', public: false} },
@@ -52,6 +54,11 @@ Vue.use(VueMoment)
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 Vue.use(axios, VueAxios)
+
+import VueLodash from 'vue-lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import round from 'lodash/round'
+Vue.use(VueLodash, { name: 'custom', lodash: { cloneDeep, round } })
 
 if(process.env.NODE_ENV == "production") {
   Vue.prototype.$api = "/kmtracker/api/public"
@@ -86,6 +93,10 @@ Vue.prototype.$groups = {
 }
 
 new Vue({
+  data: {
+    loggedIn: false,
+    username: ''
+  },
   router,
   render: h => h(App),
 }).$mount('#app')

@@ -5,14 +5,14 @@ describe('New Entry Page', () => {
 
     beforeEach(() => {
         cy.server();
-        cy.route('GET', '/api/testLogin', []).as('testLogin');
-        window.localStorage.setItem('loggedIn', 'true');
-        window.localStorage.setItem('username', 'test user');
+        cy.route('GET', '/api/getUsername', 'test user').as('getUsername');
+        window.localStorage.setItem('authToken', 'xxx');
         window.onbeforeunload = null;
     });
 
     it('can navigate to New Entry page', () => {
         cy.visit('/#/home');
+        cy.wait('@getUsername');
         cy.get('.navbar-item').contains('New Entry').click();
         cy.url().should('equal', 'http://localhost:8080/#/newEntry');
     });
@@ -20,7 +20,7 @@ describe('New Entry Page', () => {
     it('can switch between trail systems', () => {
         cy.visit('/#/newEntry');
         cy.get('#trail-system').select('mtu');
-        cy.get('#trail-system-input').should('have.value', 'mtu');
+        cy.get('#trail-system').should('have.value', 'mtu');
         cy.get('.tabs').should('contain', 'Upper Trails');
         cy.get('.tabs').should('contain', 'Competition Trails');
         cy.get('.tabs').should('contain', 'Nara Trails');
@@ -30,7 +30,7 @@ describe('New Entry Page', () => {
         cy.get('.column .trailButton').contains('Birch Loop').should('be.visible');
 
         cy.get('#trail-system').select('swedetown');
-        cy.get('#trail-system-input').should('have.value', 'swedetown');
+        cy.get('#trail-system').should('have.value', 'swedetown');
         cy.get('.tabs').should('contain', 'Main Trails');
         cy.get('.tabs').should('contain', 'Bear Trails');
         cy.get('.tabs').should('contain', 'Multi-Use Trails');
@@ -83,6 +83,78 @@ describe('New Entry Page', () => {
         cy.get('b').contains('1.2 km').should('exist');
     });
 
+    describe('custom trail system', () => {
+        beforeEach(() => {
+            cy.route('POST', '/api/newEntry', {}).as('newEntry');
+        });
+
+        it('can navigate to custom trail system and add trails', () => {
+            cy.visit('/#/newEntry');
+            cy.get('#trail-system').select('other');
+            cy.get('#custom-trail-system').type('test system');
+            cy.get('#custom-trail-name').type('test trail');
+            cy.get('#custom-trail-dist').clear().type('5');
+            cy.get('.button').contains('Add Trail').click();
+
+            cy.get('.trailsList').find('.trail-list-item').should('have.length', 1);
+            cy.get('.trail-list-item').eq(0).within(() => {
+                cy.get('.trailName').should('contain', 'test trail');
+                cy.get('.trailDist').should('contain', '5 km')
+            });
+            cy.get('b').contains('5 km').should('exist');
+
+            cy.get('#custom-trail-name').should('have.value', '');
+            cy.get('#custom-trail-dist').should('have.value', '0');
+        });
+
+        it('propertly saves custom trail system name', () => {
+            cy.visit('/#/newEntry');
+            cy.get('#trail-system').select('other');
+            cy.get('#custom-trail-system').type('test system');
+            cy.get('#custom-trail-name').type('test trail');
+            cy.get('#custom-trail-dist').clear().type('5');
+            cy.get('.button').contains('Add Trail').click();
+
+            cy.get('#technique').select('skate');
+            cy.get('.button').contains('Submit!').click();
+            cy.wait('@newEntry').its('requestBody').should('deep.equal', {
+                entryId: -1,
+                info: {
+                    comments: '',
+                    date: '2021-01-01',
+                    system: 'test system',
+                    technique: 'skate'
+                },
+                trails: [
+                    { name: 'test trail', distance: '5' }
+                ]
+            });
+        });
+
+        it('properly saves custom trail system if no name is entered', () => {
+            cy.visit('/#/newEntry');
+            cy.get('#trail-system').select('other');
+            cy.get('#custom-trail-name').type('test trail');
+            cy.get('#custom-trail-dist').clear().type('5');
+            cy.get('.button').contains('Add Trail').click();
+
+            cy.get('#technique').select('skate');
+            cy.get('.button').contains('Submit!').click();
+            cy.wait('@newEntry').its('requestBody').should('deep.equal', {
+                entryId: -1,
+                info: {
+                    comments: '',
+                    date: '2021-01-01',
+                    system: 'other',
+                    technique: 'skate'
+                },
+                trails: [
+                    { name: 'test trail', distance: '5' }
+                ]
+            });
+        });
+    });
+
     describe('custom trail', () => {
         beforeEach(() => {
             cy.visit('/#/newEntry');
@@ -92,18 +164,18 @@ describe('New Entry Page', () => {
 
         it('shows errors for invalid trail name/distance', () => {
             cy.get('.button').contains('Add Trail').click();
-            cy.get('.notification.is-danger').contains('Custom trail name must be between 5 and 100 characters').should('be.visible');
+            cy.get('.notification.is-danger').contains('Custom trail name must be between 1 and 100 characters').should('be.visible');
 
             cy.get('#custom-trail-dist').clear().type('-10000');
             cy.get('.button').contains('Add Trail').click();
             cy.get('.notification.is-danger').should('be.visible');
-            cy.get('.notification.is-danger').should('contain', 'Custom trail name must be between 5 and 100 characters');
+            cy.get('.notification.is-danger').should('contain', 'Custom trail name must be between 1 and 100 characters');
             cy.get('.notification.is-danger').should('contain', 'Custom trail distance must be between -1000 and 1000 km');
 
             cy.get('#custom-trail-name').type('test trail');
             cy.get('.button').contains('Add Trail').click();
             cy.get('.notification.is-danger').should('be.visible');
-            cy.get('.notification.is-danger').should('not.contain', 'Custom trail name must be between 5 and 100 characters');
+            cy.get('.notification.is-danger').should('not.contain', 'Custom trail name must be between 1 and 100 characters');
             cy.get('.notification.is-danger').should('contain', 'Custom trail distance must be between -1000 and 1000 km');
         });
 
@@ -135,7 +207,6 @@ describe('New Entry Page', () => {
             cy.get('.notification.is-danger').should('be.visible');
             cy.get('.notification.is-danger').should('contain', 'You must have at least one trail');
             cy.get('.notification.is-danger').should('contain', 'Technique is a required field');
-            cy.get('.notification.is-danger').should('contain', 'Trail system must be between 1 and 100 characters');
         });
 
         it('shows error if there is a server error', () => {
@@ -146,7 +217,7 @@ describe('New Entry Page', () => {
             cy.get('#technique').select('skate');
             cy.get('.button').contains('Submit!').click();
             cy.wait('@newEntry');
-            cy.get('.toast.is-danger').contains('Error saving entry').should('be.visible');
+            cy.get('.toast.is-danger').contains('There was an error saving your entry').should('be.visible');
         });
 
         it('has default date of today', () => {
@@ -166,14 +237,13 @@ describe('New Entry Page', () => {
                 entryId: -1,
                 info: {
                     comments: 'test comment',
-                    date: '2021-01-01T17:00:00.000Z',
-                    date2: '2021-01-01',
+                    date: '2021-01-01',
                     system: 'mtu',
                     technique: 'skate'
                 },
                 trails: [
-                    { name: 'Birch Loop', distance: 1.2, color: 'green' },
-                    { name: 'Oak Loop', distance: 1.1, color: 'green' }
+                    { name: 'Birch Loop', distance: 1.2 },
+                    { name: 'Oak Loop', distance: 1.1 }
                 ]
             });
 
@@ -230,14 +300,13 @@ describe('New Entry Page', () => {
                 entryId: -1,
                 info: {
                     comments: '',
-                    date: '2021-01-01T17:00:00.000Z',
-                    date2: '2021-01-01',
+                    date: '2021-01-01',
                     system: 'mtu',
                     technique: 'classic'
                 },
                 trails: [
-                    { name: 'Birch Loop', distance: 1.2, color: 'green' },
-                    { name: 'Oak Loop', distance: 1.1, color: 'green' }
+                    { name: 'Birch Loop', distance: 1.2 },
+                    { name: 'Oak Loop', distance: 1.1 }
                 ]
             });
 
@@ -296,7 +365,7 @@ describe('New Entry Page', () => {
             cy.route('GET', '/api/loadEntry/1', testEntry).as('loadEntry');
         });
 
-        it.only('can load existing entry', () => {
+        it('can load existing entry', () => {
             cy.visit('/#/newEntry/1');
             cy.wait('@loadEntry');
             cy.get('#date-picker').should('have.value', '1/2/2021');
@@ -312,6 +381,143 @@ describe('New Entry Page', () => {
                 cy.get('.trailDist').should('contain', '1.1 km')
             });
             cy.get('b').contains('2.3 km').should('exist');
+        });
+
+        it('can add trails', () => {
+            cy.visit('/#/newEntry/1');
+            cy.wait('@loadEntry');
+            cy.get('.trailButton').contains('Superior Loop').click();
+            cy.get('.trailsList').find('.trail-list-item').should('have.length', 3);
+            cy.get('.trail-list-item').eq(2).within(() => {
+                cy.get('.trailName').should('contain', 'Superior Loop');
+                cy.get('.trailDist').should('contain', '0.8 km')
             });
+            cy.get('b').contains('3.1 km').should('exist');
+        });
+
+        it('can remove trails', () => {
+            cy.visit('/#/newEntry/1');
+            cy.wait('@loadEntry');
+            cy.get('.trail-list-item').eq(1).within(() => {
+                cy.get('.delete').click();
+            });
+            cy.get('.trailsList').find('.trail-list-item').should('have.length', 1);
+            cy.get('.trail-list-item').eq(0).within(() => {
+                cy.get('.trailName').should('contain', 'Birch Loop');
+                cy.get('.trailDist').should('contain', '1.2 km')
+            });
+            cy.get('b').contains('1.2 km').should('exist');
+        });
+
+        it('saves updated entry', () => {
+            cy.route('POST', '/api/editEntry', {}).as('editEntry');
+            cy.visit('/#/newEntry/1');
+            cy.wait('@loadEntry');
+            cy.get('.trail-list-item').eq(1).within(() => {
+                cy.get('.delete').click();
+            });
+            cy.get('.trailButton').contains('Superior Loop').click();
+            cy.get('#technique').select('backcountry');
+            cy.get('#comments').type('2');
+            cy.get('.button').contains('Submit!').click();
+            cy.wait('@editEntry').its('requestBody').should('deep.equal', {
+                entryId: 1,
+                info: {
+                    comments: 'test comment2',
+                    date: '2021-01-02',
+                    system: 'mtu',
+                    technique: 'backcountry'
+                },
+                trails: [
+                    { name: 'Birch Loop', distance: '1.2' },
+                    { name: 'Superior Loop', distance: 0.8 }
+                ]
+            });
+
+            cy.url().should('equal', 'http://localhost:8080/#/leaderboard');
+            cy.get('.toast.is-success').contains('Your entry has been saved!').should('be.visible');
+            cy.get('.modal.is-active').should('not.exist');
+        });
+
+        it('loads custom trail system w/ custom name correctly', () => {
+            const testEntry = {
+                date: '2021-01-02',
+                system: 'test system',
+                technique: 'skate',
+                comments: 'test comment',
+                trailsList: [
+                    { name: 'Birch Loop', distance: '1.2' },
+                    { name: 'Oak Loop', distance: '1.1' }
+                ]
+            };
+            cy.route('GET', '/api/loadEntry/1', testEntry).as('loadEntry');
+            
+            cy.visit('/#/newEntry/1');
+            cy.wait('@loadEntry');
+            cy.get('#trail-system').should('have.value', 'other');
+            cy.get('#custom-trail-system').should('have.value', 'test system');
+        });
+
+        it('loads custom trail system w/ blank custom name correctly', () => {
+            const testEntry = {
+                date: '2021-01-02',
+                system: 'other',
+                technique: 'skate',
+                comments: 'test comment',
+                trailsList: [
+                    { name: 'Birch Loop', distance: '1.2' },
+                    { name: 'Oak Loop', distance: '1.1' }
+                ]
+            };
+            cy.route('GET', '/api/loadEntry/1', testEntry).as('loadEntry');
+            
+            cy.visit('/#/newEntry/1');
+            cy.wait('@loadEntry');
+            cy.get('#trail-system').should('have.value', 'other');
+            cy.get('#custom-trail-system').should('have.value', '');
+        });
+
+        it('does not show unsaved changes warning on original load', () => {
+            const testEntry = {
+                date: '2021-01-02',
+                system: 'other',
+                technique: 'skate',
+                comments: 'test comment',
+                trailsList: [
+                    { name: 'Birch Loop', distance: '1.2' },
+                    { name: 'Oak Loop', distance: '1.1' }
+                ]
+            };
+            cy.route('GET', '/api/loadEntry/1', testEntry).as('loadEntry');
+            
+            cy.visit('/#/newEntry/1');
+            cy.wait('@loadEntry');
+            cy.get('.navbar-item').contains('Home').click();
+            cy.url().should('equal', 'http://localhost:8080/#/home');
+        });
+
+        it('shows unsaved changes warning after a change', () => {
+            const testEntry = {
+                date: '2021-01-02',
+                system: 'other',
+                technique: 'skate',
+                comments: 'test comment',
+                trailsList: [
+                    { name: 'Birch Loop', distance: '1.2' },
+                    { name: 'Oak Loop', distance: '1.1' }
+                ]
+            };
+            cy.route('GET', '/api/loadEntry/1', testEntry).as('loadEntry');
+            
+            cy.visit('/#/newEntry/1');
+            cy.wait('@loadEntry');
+            cy.get('#comments').type('2');
+            cy.get('.navbar-item').contains('Home').click();
+            cy.get('.modal.is-active').should('be.visible');
+            cy.get('.modal-card-title').should('contain', 'Are you sure?');
+            cy.url().should('equal', 'http://localhost:8080/#/newEntry/1');
+            cy.get('.button').contains('OK').click();
+            cy.url().should('equal', 'http://localhost:8080/#/home');
+        });
     });
 });

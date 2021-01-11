@@ -1,0 +1,18 @@
+[
+    {
+        "entryId": 1,
+        "distance": "1.2",
+        "system": "mtu",
+        "date": "2021-01-01",
+        "technique": "skate",
+        "comments": "test comment"
+    },
+    {
+        "entryId": 2,
+        "distance": "3.2",
+        "system": "swedetown",
+        "date": "2021-01-02",
+        "technique": "classic",
+        "comments": ""
+    }
+]

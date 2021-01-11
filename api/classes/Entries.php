@@ -46,7 +46,7 @@ class Entries extends Mapper {
                 'distance' => $trail['distance'],
                 'username' => $username,
                 'system' => $info['system'],
-                'date' => $info['date2'],
+                'date' => $info['date'],
                 'comments' => $info['comments'],
                 'type' => $info['technique'],
                 'entryId' => $entryId

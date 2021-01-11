@@ -89,6 +89,18 @@ class Util extends Mapper {
 		return $results;
 	}
 
+	public function getUsername($userId) {
+		$stmt = $this->db->prepare("SELECT username FROM users WHERE id=:userId");
+		$stmt->execute([ 'userId' => $userId ]);
+		
+		$username = '';
+		while ($row = $stmt->fetch()) {
+			$username = $row['username'];
+		}
+
+		return $username;
+	}
+
 	/**
 	 * Returns true if the given username is valid
 	 * Returns false if the given username is already taken/or invalid

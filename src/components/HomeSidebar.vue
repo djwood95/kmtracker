@@ -1,7 +1,6 @@
 <template>
     <div>
-        <login-box v-if="!loggedIn && ($mq !== 'mobile' || mobileLoginBoxActive)"></login-box>
-        <!--<StatBox></StatBox>-->
+        <login-box v-if="!loggedIn"></login-box>
         <div>
             <p class="sidebarHeader">Trail Conditions</p>
             <p>Want to get out skiing, but don't know if the trails are groomed? Check out the sites below for trail conditions:</p>
@@ -15,24 +14,15 @@
 
 <script>
 import LoginBox from './LoginBox.vue'
-import StatBox from './StatBox.vue'
 export default {
     components: {
-        LoginBox,
-        StatBox
+        LoginBox
     },
 
-    data() {
-        return {
-            mobileLoginBoxActive: false,
-            loggedIn: localStorage.getItem('loggedIn')=='true'
+    computed: {
+        loggedIn() {
+            return this.$root.$data.loggedIn;
         }
-    },
-
-    mounted() {
-        this.$root.$on('loggedInEvent', () => {
-            this.loggedIn = localStorage.getItem('loggedIn')=='true';
-        });
     }
 }
 </script>

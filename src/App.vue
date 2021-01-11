@@ -2,7 +2,7 @@
 <div id="scrollContainer">
   <div id="mainContainer">
     
-        <nav class="navbar" :class="{'is-fixed-top': $mq==='mobile'}">
+        <nav class="navbar" v-if="showNavBar" :class="{'is-fixed-top': $mq==='mobile'}">
           <div class="navbar-brand">
             <router-link to="/home" class="navbar-item topLevel">Home</router-link>
             <router-link to="/leaderboard" class="navbar-item topLevel">Leaderboard</router-link>
@@ -56,10 +56,23 @@ export default {
 
   data() {
     return {
-      loggedIn: localStorage.getItem('loggedIn')=='true',
-      username: localStorage.getItem('username'),
       mobileMenuActive: false,
       loginModal: false
+    }
+  },
+
+  computed: {
+    loggedIn() {
+      return this.$root.$data.loggedIn;
+    },
+
+    username() {
+      return this.$root.$data.username;
+    },
+
+    showNavBar() {
+      if (this.$route.meta.header === undefined) return true;
+      return this.$route.meta.header;
     }
   },
 
@@ -73,20 +86,27 @@ export default {
 
   },
 
-  mounted() {
-    this.$root.$on('loggedInEvent', () => {
-        this.loggedIn = localStorage.getItem('loggedIn')=='true';
-        if(!this.loggedIn) this.mobileMenuActive = false;
-        this.username = localStorage.getItem('username');
-    });
+  created() {
+    const authToken = localStorage.getItem('authToken');
+    this.$http.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
 
+    this.$http.get(`${this.$api}/api/getUsername`).then(response => {
+      this.$root.$data.username = response.data;
+      this.$root.$data.loggedIn = true;
+    }).catch(() => {
+      this.$root.$data.loggedIn = false;
+      localStorage.removeItem('authToken');
+    });
+  },
+
+  mounted() {
     this.$root.$on('showLoginBox', () => {
         this.loginModal = true;
     });
 
     this.$root.$on('checkLogin', () => {
       this.$http.get(this.$api+'/api/testLogin').then(() => {
-      }).catch(error => {
+      }).catch(() => {
           this.$router.push('/login');
       });
     });
@@ -100,38 +120,29 @@ export default {
       });
 
       if (this.$env != "production") {
+        // eslint-disable-next-line no-console
         console.log(error);
       }
     });
-
-    this.updateLoginStatus();
   },
 
   methods: {
     logout() {
-      localStorage.setItem('loggedIn', false);
+      localStorage.removeItem('authToken');
+      this.$http.defaults.headers.common['Authorization'] = null;
       this.$router.push('/');
-      this.$root.$emit('loggedInEvent');
+      this.$root.$data.loggedIn = false;
+      this.$root.$data.username = '';
     },
 
     trackPageLoad(toRoute, fromRoute) {
       let isLoggedIn = localStorage.getItem('loggedIn') == 'true';
       this.$http.post(this.$api+'/trackPageLoad', {
-                                                    toPage: toRoute.meta.name,
-                                                    fromPage: fromRoute.meta.name,
-                                                    loggedIn: isLoggedIn,
-                                                    deviceWidth: screen.width,
-                                                    deviceHeight: screen.height
-                                                  });
-    },
-
-    updateLoginStatus() {
-      this.$http.get(this.$api+'/api/testLogin').then(() => {
-        localStorage.setItem('loggedIn', 'true');
-        this.$root.$emit('loggedInEvent');
-      }).catch(error => {
-        localStorage.setItem('loggedIn', 'false');
-        this.$root.$emit('loggedInEvent');
+        toPage: toRoute.meta.name,
+        fromPage: fromRoute.meta.name,
+        loggedIn: isLoggedIn,
+        deviceWidth: screen.width,
+        deviceHeight: screen.height
       });
     }
   }

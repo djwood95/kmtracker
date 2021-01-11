@@ -47,26 +47,19 @@
 <script>
 
 import Sidebar from './HomeSidebar.vue'
-import LoginBoxModal from './LoginBoxModal.vue'
-
 export default {
   name: 'Home',
   components: {
-    Sidebar,
-    LoginBoxModal
+    Sidebar
   },
 
-  data() {
-    return {
-      loggedIn: localStorage.getItem('loggedIn')=='true',
+  computed: {
+    loggedIn() {
+      return this.$root.$data.loggedIn;
     }
   },
 
   mounted() {
-    this.$root.$on('loggedInEvent', () => {
-        this.loggedIn = localStorage.getItem('loggedIn')=='true';
-    });
-
     this.$root.$on('showLoginBox', () => {
       this.loginModal = true;
     });
@@ -76,7 +69,7 @@ export default {
     openLoginModal() {
       this.$buefy.modal.open({
         parent: this,
-        component: LoginBoxModal,
+        component: () => import('./LoginBoxModal'),
         hasModalCard: true,
         trapFocus: true
       });

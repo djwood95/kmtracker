@@ -8,10 +8,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "@fortawesome/fontawesome-free": "^5.15.1",
+    "@mdi/font": "^5.8.55",
+    "axios": "^0.21.1",
     "buefy": "^0.9.4",
+    "lodash": "^4.17.20",
     "vue": "^2.5.17",
     "vue-axios": "^2.1.4",
+    "vue-lodash": "^2.1.2",
     "vue-moment": "^4.1.0",
     "vue-mq": "^1.0.1",
     "vue-progress": "^0.2.1",
@@ -20,7 +24,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.2.0",
     "@vue/cli-plugin-eslint": "^3.2.0",
-    "@vue/cli-service": "^3.2.0",
+    "@vue/cli-service": "^4.5.10",
     "babel-eslint": "^10.0.1",
     "cypress": "^6.2.0",
     "eslint": "^5.8.0",

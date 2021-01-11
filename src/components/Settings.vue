@@ -4,15 +4,30 @@
         <h3 class="has-text-centered">Change Password</h3>
         
         <b-field label="New Password" horizontal>
-            <b-input type="password" password-reveal minlength="6" maxlength="100" placeholder="password" v-model="password1"></b-input>
-            <b-input type="password" password-reveal minlength="6" maxlength="100" placeholder="repeat password" v-model="password2"></b-input>
-            <div class="button is-primary" @click="saveNewPass()">Go!</div>
+            <b-input
+                id="password1"
+                type="password"
+                password-reveal
+                minlength="6" maxlength="100"
+                placeholder="password"
+                v-model="password1"
+            />
+            <b-input
+                id="password2"
+                type="password"
+                password-reveal
+                minlength="6" maxlength="100"
+                placeholder="repeat password"
+                v-model="password2"
+                @keypress.native.enter="saveNewPass()"
+            />
+            <div id="save-pass-button" class="button is-primary" @click="saveNewPass()">Go!</div>
         </b-field>
 
         <h3 class="has-text-centered">Change Colorgroup</h3>
 
         <b-field label="New Color Group" horizontal>
-            <b-select placeholder="Select a Color Group" v-model="selectedGroup" expanded :loading="groupListLoading">
+            <b-select id="color-group" placeholder="Select a Color Group" v-model="selectedGroup" expanded :loading="groupListLoading">
                 <option
                     v-for="(group,i) in groupList"
                     :value="group.abbr"
@@ -20,7 +35,7 @@
                     {{ group.name }}
                 </option>
             </b-select>
-            <div class="button is-primary" @click="saveNewGroup()">Go!</div>
+            <div id="save-group-button" class="button is-primary" @click="saveNewGroup()">Go!</div>
         </b-field>
     </div>
 </template>
@@ -53,7 +68,7 @@ export default {
 
     methods: {
         saveNewGroup() {
-            this.$http.post(this.$api+'/api/settings/saveColorGroup', {colorgroup: this.selectedGroup}).then(response => {
+            this.$http.post(this.$api+'/api/settings/saveColorGroup', {colorgroup: this.selectedGroup}).then(() => {
                 this.$buefy.toast.open({
                     duration: 2000,
                     message: 'New color group saved!',
@@ -70,7 +85,7 @@ export default {
 
         saveNewPass() {
             //check that passwords match
-            if(this.password1 != this.password2) {
+            if(this.password1 !== this.password2) {
                 this.$buefy.toast.open({
                     duration: 2000,
                     message: 'Passwords do not match.',
@@ -89,7 +104,9 @@ export default {
                 return;
             }
 
-            this.$http.post(this.$api+'/api/settings/saveNewPass', {newPass: this.password1}).then(response => {
+            this.$http.post(this.$api+'/api/settings/saveNewPass', {newPass: this.password1}).then(() => {
+                this.password1 = '';
+                this.password2 = '';
                 this.$buefy.toast.open({
                     duration: 2000,
                     message: 'New password saved!',

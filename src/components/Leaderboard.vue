@@ -4,26 +4,24 @@
         <div id="leaderboardSettings" v-if="header">
             <b-field grouped group-multiline v-if="!groupStandingsMode">
                 <b-field label="Filter By Group:">
-                    <b-select v-model="selectedGroup">
+                    <b-select id="group-filter" v-model="selectedGroup">
                         <option value='All'>All</option>
                         <option v-for="(group,i) in groupList" :value="group.abbr" :key="i">{{group.name}}</option>
                     </b-select>
                 </b-field>
 
-                <b-field label="Start Date:">
-                    <b-datepicker icon="calendar-today" v-model="startDate" :disabled="dateMode==='lifetime' || dateMode === 'allSeasons'"></b-datepicker>
+                <b-field id="start-date-field" label="Start Date:">
+                    <b-datepicker id="start-date" icon="calendar" v-model="startDate" :disabled="dateMode==='lifetime' || dateMode === 'allSeasons'"></b-datepicker>
                 </b-field>
 
-                <b-field label="End Date:">
-                    <b-field>
-                        <b-datepicker icon="calendar-today" v-model="endDate" :disabled="dateMode==='lifetime' || dateMode === 'allSeasons'"></b-datepicker>
-                        <div class="button is-primary" :disabled="!dateChanged" @click="customDates()">
-                            <span class="icon is-small">
-                                <i class="fas fa-chevron-right"></i>
-                            </span>
-                        </div>
-                    </b-field>                  
-                </b-field>
+                <b-field id="end-date-field" label="End Date:">
+                    <b-datepicker id="end-date" icon="calendar" v-model="endDate" :disabled="dateMode==='lifetime' || dateMode === 'allSeasons'"></b-datepicker>
+                    <b-button id="go-button" type="is-primary" :disabled="!dateChanged" @click="customDates()">
+                        <span class="icon is-small">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </b-button>
+                </b-field>                  
 
             </b-field>
 
@@ -47,6 +45,10 @@
                     <span>Individual Standings</span>
                 </div>
             </div>
+        </div>
+
+        <div class="content p-3 has-text-centered" v-if="!header">
+            <b-button type="is-primary" icon-right="chevron-right" @click="openInNewTab()">KMTracker.org</b-button>
         </div>
 
         <div>
@@ -154,11 +156,7 @@ export default {
                 this.isLoading = false;
             }).catch(error => {
                 this.isLoading = false;
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error loading group standings',
-                    type: 'is-danger'
-                });
+                this.$root.$emit('handle-error', error, 'Error loading group standings');
             });
         },
 
@@ -178,11 +176,7 @@ export default {
                 },500);
             }).catch(error => {
                 this.isLoading = false;
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error loading leaderboard',
-                    type: 'is-danger'
-                });
+                this.$root.$emit('handle-error', error, 'Error loading leaderboard');
             });
         },
 
@@ -191,7 +185,7 @@ export default {
             for(var key in this.filteredList) {
                 sum += parseFloat(this.filteredList[key].kms);
             }
-            this.total = Math.round(sum);
+            this.total = this._.round(sum, 1);
         },
 
         thisWeek() {
@@ -209,11 +203,7 @@ export default {
                 this.dateMode = 'thisWeek';
             }).catch(error => {
                 this.isLoading = false;
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error loading leaderboard',
-                    type: 'is-danger'
-                });
+                this.$root.$emit('handle-error', error, 'Error loading this week\'s leaderboard');
             });
         },
 
@@ -229,11 +219,7 @@ export default {
                 this.dateChanged = false;
             }).catch(error => {
                 this.isLoading = false;
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error loading leaderboard',
-                    type: 'is-danger'
-                });
+                this.$root.$emit('handle-error', error, 'Error loading leaderboard');
             });
         },
 
@@ -246,11 +232,7 @@ export default {
                 this.dateMode = 'lifetime';
             }).catch(error => {
                 this.isLoading = false;
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error loading leaderboard',
-                    type: 'is-danger'
-                });
+                this.$root.$emit('handle-error', error, 'Error loading lifetime leaderboard');
             });
         },
 
@@ -263,12 +245,12 @@ export default {
                 this.dateMode = 'allSeasons';
             }).catch(error => {
                 this.isLoading = false;
-                this.$buefy.toast.open({
-                    duration: 2000,
-                    message: 'Error loading leaderboard',
-                    type: 'is-danger'
-                });
+                this.$root.$emit('handle-error', error, 'Error loading all seasons leaderboard');
             });
+        },
+
+        openInNewTab() {
+            window.open('https://kmtracker.org', '_new');
         }
     }
 }

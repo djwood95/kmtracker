@@ -21,8 +21,8 @@ export default {
 
     watch: {
         loginModalActive() {
-            if(!this.loginModalActive) {
-                if(localStorage.getItem('loggedIn')=='true') this.$router.go(-1);
+            if (!this.loginModalActive) {
+                if (this.$root.$data.loggedIn) this.$router.go(-1);
                 else this.$router.push('/');
             }
         }

@@ -179,8 +179,18 @@
         "trails": {
             "Main Trails": {
                 "color": "green",
-                "mapFile": "Easy.png",
+                "mapFile": "swedetown-main.png",
                 "trails": [
+                    {
+                        "name": "Len's Loop",
+                        "distance": 1.0,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Tiger Loop",
+                        "distance": 0.3,
+                        "color": "blue"
+                    },
                     {
                         "name": "Valley Trail",
                         "distance": 1.4,
@@ -193,28 +203,8 @@
                     },
                     {
                         "name": "Tamarack Loop",
-                        "distance": 1.1,
-                        "color": "green"
-                    },
-                    {
-                        "name": "Greenstone Loop",
-                        "distance": 3.0,
-                        "color": "green"
-                    },
-                    {
-                        "name": "Len's Loop",
-                        "distance": 1.0,
+                        "distance": 1.3,
                         "color": "blue"
-                    },
-                    {
-                        "name": "Pine Loop",
-                        "distance": 1.7,
-                        "color": "blue"
-                    },
-                    {
-                        "name": "Powderhouse Loop",
-                        "distance": 4.5,
-                        "color": "black"
                     },
                     {
                         "name": "Birch Loop",
@@ -223,8 +213,23 @@
                     },
                     {
                         "name": "Ed's Loop",
-                        "distance": 2.0,
+                        "distance": 2.2,
                         "color": "black"
+                    },
+                    {
+                        "name": "Pine-Ridge Loop",
+                        "distance": 1.7,
+                        "color": "blue"
+                    },
+                    {
+                        "name": "Powderhouse Loop",
+                        "distance": 3.9,
+                        "color": "black"
+                    },
+                    {
+                        "name": "Greenstone Loop",
+                        "distance": 3.0,
+                        "color": "green"
                     },
                     {
                         "name": "Backcountry Loop",
@@ -236,7 +241,7 @@
 
             "Bear Trails": {
                 "color": "blue",
-                "mapFile": "Bear.png",
+                "mapFile": "swedetown-bear.png",
                 "trails": [
                     {
                         "name": "Mama Bear Loop",
@@ -258,11 +263,11 @@
 
             "Multi-Use Trails": {
                 "color": "purple",
-                "mapFile": "MultiUse.png",
+                "mapFile": "swedetown-multi-use.png",
                 "trails": [
                     {
                         "name": "Bruce's Crossing",
-                        "distance": 1.0,
+                        "distance": 0.3,
                         "color": "purple"
                     },
                     {
@@ -271,8 +276,13 @@
                         "color": "purple"
                     },
                     {
-                        "name": "Unnamed Multi-Use Loop",
+                        "name": "1.2km Loop",
                         "distance": 1.2,
+                        "color": "purple"
+                    },
+                    {
+                        "name": "1.0km Loop",
+                        "distance": 1.0,
                         "color": "purple"
                     }
                 ]

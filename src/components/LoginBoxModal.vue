@@ -12,7 +12,8 @@
             <b-field label="Password">
                 <b-input id="password" type="password" required password-reveal
                     v-model="password"
-                    placeholder="password">
+                    placeholder="password"
+                    @keypress.native.enter="checkLogin()">
                 </b-input>
             </b-field>
         </section>
@@ -41,34 +42,19 @@ export default {
     },
 
     mounted() {
-        this.loggedIn = localStorage.getItem('loggedIn')=='true';
-
-        this.$root.$on('loggedInEvent', () => {
-            this.loggedIn = localStorage.getItem('loggedIn')=='true';
-        });
     },
 
     methods: {
         checkLogin() {
             this.$http.post(this.$api+'/checkLogin', {username: this.username, password: this.password}).then(response => {
-                localStorage.setItem('loggedIn', true);
                 localStorage.setItem('authToken', response.data.token.token);
-                localStorage.setItem('expires', new Date(response.data.token.expires*1000));
-                localStorage.setItem('username', response.data.username);
                 this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token.token;
-                this.$root.$emit('loggedInEvent');
+                this.$root.$data.loggedIn = true;
+                this.$root.$data.username = response.data.username;
                 this.$parent.close();
             }).catch(() => {
                 this.badPassMsgActive = true;
             });
-        },
-
-        newAccount() {
-
-        },
-
-        forgotPass() {
-
         }
     }
 }

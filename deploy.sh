@@ -1,5 +1,6 @@
 #!/bin/sh
 
+npx cypress run -b chrome --headless
 npm run build
 scp -r ./dist djwood@kmtracker:/var/www/html/kmtracker
 scp -r ./api/classes djwood@kmtracker:/var/www/html/kmtracker/api

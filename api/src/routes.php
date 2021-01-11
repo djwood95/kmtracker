@@ -150,6 +150,18 @@ $app->group('/api', function() use ($app) {
         return $response;
     });
 
+    $app->get('/getUsername', function (Request $request, Response $response, array $args) {
+        $userId = $request->getAttribute('userId');
+        $util = new Util($this->db);
+        $username = $util->getUsername($userId);
+
+        if ($username == '') {
+            return $response->withStatus(500);
+        }
+        
+        return $response->withJson($username);
+    });
+
     $app->get('/settings/getColorGroup', function (Request $request, Response $response, array $args) {
         $userId = $request->getAttribute('userId');
 

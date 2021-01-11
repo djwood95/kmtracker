@@ -110,6 +110,7 @@ export default {
             if (this.usernameExists === null) return '';
             if (this.usernameErrorMsg.length === 0) return 'is-success';
             if (this.usernameErrorMsg.length > 0) return 'is-danger';
+            return '';
         },
 
         passwordErrorMsg() {
@@ -128,6 +129,7 @@ export default {
             if (this.info.password1.length === 0 && this.info.password2.length === 0) return '';
             if (this.passwordErrorMsg.length === 0) return 'is-success';
             if (this.passwordErrorMsg.length > 0) return 'is-danger';
+            return '';
         }
     },
 
@@ -147,9 +149,13 @@ export default {
                 this.errors.push(this.usernameErrorMsg);
             }
 
+            if (this.info.selectedGroup.length === 0) {
+                this.errors.push('Color Group is required');
+            }
+
             if (this.errors.length > 0) return;
 
-            this.$http.post(this.$api+'/newAccount', {info: this.info}).then(response => {
+            this.$http.post(this.$api+'/newAccount', {info: this.info}).then(() => {
                 this.$buefy.toast.open({
                     duration: 3000,
                     message: 'Your account was created!',

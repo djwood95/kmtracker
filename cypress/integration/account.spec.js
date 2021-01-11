@@ -3,10 +3,10 @@ describe('Login', () => {
         cy.server();
         cy.route({
             method: 'GET',
-            url: '/api/testLogin',
+            url: '/api/getUsername',
             status: 401,
             response: []
-        }).as('testLogin');
+        }).as('getUsername');
 
         cy.route({
             method: 'POST',
@@ -27,7 +27,7 @@ describe('Login', () => {
 
     it('checks login on page load (logged out)', () => {
         cy.visit('/home');
-        cy.wait('@testLogin');
+        cy.wait('@getUsername');
         cy.get('.sidebarHeader').contains('Login').should('be.visible');
         cy.get('#username').should('be.visible');
         cy.get('#password').should('be.visible');
@@ -35,12 +35,11 @@ describe('Login', () => {
     });
 
     it('checks login on page load (logged in)', () => {
-        window.localStorage.setItem('loggedIn', 'true');
-        window.localStorage.setItem('username', 'test user');
-        cy.route({ method: 'GET', url: '/api/testLogin', status: 200, response: {} }).as('testLogin');
+        window.localStorage.setItem('authToken', 'xxx');
+        cy.route({ method: 'GET', url: '/api/getUsername', status: 200, response: { username: 'test user' } }).as('getUsername');
 
         cy.visit('/home');
-        cy.wait('@testLogin');
+        cy.wait('@getUsername');
         cy.get('.navbar-item').contains('New Entry').should('be.visible');
         cy.get('.navbar-item').contains('test user').should('be.visible');
         cy.get('.sidebarHeader').contains('Login').should('not.exist');
@@ -126,9 +125,9 @@ describe('Login', () => {
     it('can logout', () => {
         window.localStorage.setItem('loggedIn', 'true');
         window.localStorage.setItem('username', 'test user');
-        cy.route({ method: 'GET', url: '/api/testLogin', status: 200, response: {} }).as('testLogin');
+        cy.route({ method: 'GET', url: '/api/getUsername', status: 200, response: 'test user' }).as('getUsername');
         cy.visit('/home');
-        cy.wait('@testLogin');
+        cy.wait('@getUsername');
         cy.get('.navbar-item').contains('New Entry').should('be.visible');
         cy.get('.navbar-item').contains('test user').should('be.visible');
         cy.get('.navbar-item').contains('Logout').click({ force: true });
@@ -139,9 +138,9 @@ describe('Login', () => {
     it('logout from protected page', () => {
         window.localStorage.setItem('loggedIn', 'true');
         window.localStorage.setItem('username', 'test user');
-        cy.route({ method: 'GET', url: '/api/testLogin', status: 200, response: {} }).as('testLogin');
+        cy.route({ method: 'GET', url: '/api/getUsername', status: 200, response: 'test user' }).as('getUsername');
         cy.visit('/#/newEntry');
-        cy.wait('@testLogin');
+        cy.wait('@getUsername');
         cy.get('.navbar-item').contains('Logout').click({ force: true });
         cy.url().should('not.include', '/newEntry');
     });
